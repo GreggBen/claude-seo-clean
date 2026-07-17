@@ -1,0 +1,8 @@
+# Venv Python (régénéré par install.sh sur chaque poste)
+skills/seo/.venv/
+**/.venv/
+**/__pycache__/
+*.pyc
+# Tokens OAuth locaux (ne JAMAIS committer)
+**/oauth-token.json
+.env
