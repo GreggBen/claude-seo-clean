@@ -1,4 +1,4 @@
-# claude-seo-clean — 23 skills SEO/AEO pour Claude Code, version assainie
+# claude-seo-clean — 24 skills SEO/AEO pour Claude Code, version assainie
 
 Une boîte à outils SEO/AEO pour [Claude Code](https://claude.com/claude-code) : audit de site,
 schema.org, AEO (citabilité par les IA — AI Overviews, ChatGPT, Perplexity), Core Web Vitals,
@@ -55,10 +55,11 @@ Les skills **prompt-only** (`seo-schema`, `seo-geo`, `seo-content`) marchent **s
 
 ---
 
-## Les 23 skills
+## Les 24 skills
 
 **Audit & technique**
 - `seo` — orchestrateur : route vers les spécialistes, détecte le type de site.
+- `seo-fix` — corrèle 3 vues d'une page (HTML brut, DOM rendu, code source) et corrige à la source ; la seule skill qui lit la codebase et y écrit, avec re-mesure obligatoire.
 - `seo-audit` — audit complet, délègue à jusqu'à 15 spécialistes, score de santé.
 - `seo-technical` — crawlabilité, indexabilité, sécurité, Core Web Vitals (INP), rendu JS.
 - `seo-page` — analyse on-page profonde d'une URL.
