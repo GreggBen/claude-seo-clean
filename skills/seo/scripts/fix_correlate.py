@@ -36,6 +36,7 @@ import json
 import re
 import sys
 import unicodedata
+from html.parser import HTMLParser
 from typing import Any, Dict, Iterable, List, Optional
 
 SCHEMA_VERSION = "1.0"
@@ -73,9 +74,30 @@ def normalise(text: str) -> str:
     return " ".join(text.split())
 
 
+class _ClaimTextParser(HTMLParser):
+    def __init__(self) -> None:
+        super().__init__(convert_charrefs=True)
+        self.parts: List[str] = []
+
+    def handle_data(self, data: str) -> None:
+        self.parts.append(data)
+
+    def handle_starttag(self, tag: str, attrs: list) -> None:
+        if tag in {"p", "div", "br", "li", "ul", "ol", "h1", "h2", "h3"}:
+            self.parts.append(" ")
+
+    def handle_endtag(self, tag: str) -> None:
+        if tag in {"p", "div", "li", "ul", "ol", "h1", "h2", "h3"}:
+            self.parts.append(" ")
+
+
 def contained(needle: str, haystack_norm: str) -> bool:
     """True when a meaningful prefix of `needle` appears in the normalised text."""
-    n = normalise(needle)
+    # Answer.text peut contenir du HTML : comparer les deux projections textuelles.
+    parser = _ClaimTextParser()
+    parser.feed(needle)
+    parser.close()
+    n = normalise("".join(parser.parts))
     if not n:
         return True  # nothing claimed, nothing to show
     probe = n[:MATCH_PREFIX_CHARS] if len(n) > MATCH_PREFIX_CHARS else n

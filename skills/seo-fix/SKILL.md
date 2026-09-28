@@ -14,7 +14,7 @@ argument-hint: "[url and/or path] [--scan|--fix|--verify]"
 license: MIT
 metadata:
   author: AgriciDaniel
-  version: "1.0.0"
+  version: "1.0.1"
   category: seo
 ---
 
@@ -139,6 +139,12 @@ Guessing which file causes a symptom is how automated tools corrupt codebases. T
 `OBSERVED` state exists to make that guess impossible rather than merely discouraged.
 
 Full catalogue and detection rules: `references/correlation-engine.md`.
+
+Les textes déclarés en JSON-LD peuvent contenir du HTML, notamment `Answer.text`.
+Le corrélateur compare leur projection textuelle (balises retirées, entités
+décodées, limites de blocs conservées) au texte observé. Une réponse réellement
+absente reste signalée. Après un changement du détecteur, reprendre la baseline :
+la disparition d'un faux positif ne constitue pas une réparation du site.
 
 ---
 

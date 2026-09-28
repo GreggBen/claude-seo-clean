@@ -14,7 +14,7 @@ argument-hint: "[command] [url|property]"
 license: MIT
 metadata:
   author: AgriciDaniel
-  version: "2.2.0"
+  version: "2.2.1"
   category: seo
 ---
 
@@ -126,6 +126,15 @@ Search Analytics: clicks, impressions, CTR, position for last 28 days.
 **Default:** 28 days, dimensions=query,page, type=web, limit=1000.
 
 Includes quick-win detection: queries at position 4-10 with high impressions.
+
+Le résultat distingue `status` et `totals_status` (`OK`, `PARTIAL`, `ERROR`,
+`NOT_AVAILABLE`). Une métrique absente reste `null` ; un zéro n'est conservé
+que s'il est retourné par la source. Sans impressions, CTR et position sont
+indisponibles. Les totaux viennent de `dimensionless_aggregate` ; le repli
+`dimension_row_sum` est marqué `PARTIAL`, avec l'erreur et sa limite de couverture.
+Le CTR produit est en points de pourcentage (`ctr_unit="percent"`) : `5` signifie
+5 %. Les exports respectent cette unité ; un ratio demande `ctr_unit="ratio"`.
+Une erreur CLI retourne le code 1, y compris avec `--json`.
 
 ### `/seo google inspect <url>`
 

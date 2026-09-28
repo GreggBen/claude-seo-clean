@@ -6,7 +6,7 @@ argument-hint: "[command] [url]"
 license: MIT
 metadata:
   author: AgriciDaniel
-  version: "2.2.0"
+  version: "2.2.1"
   category: seo
 ---
 
@@ -54,6 +54,20 @@ extension is also installable (see "Optional Extensions" below).
 | `/seo flow [stage] [url\|topic]` | FLOW framework: evidence-led prompts for Find, Leverage, Optimize, Win, or Local stages |
 
 ## Orchestration Logic
+
+### Contrat de rapport du projet
+
+Lire les instructions du projet avant de déléguer. Si elles interdisent les
+scores agrégés, chaque spécialiste rend des constats individuels avec statut,
+entrées, sources, date, preuve et limites ; le rapport omet les scores SEO,
+E-E-A-T, GEO et visibilité, ainsi que leurs pondérations. Transmettre ce contrat
+à chaque sous-agent. Une erreur ou une donnée absente porte un état explicite,
+jamais un zéro. GSC, GA4, GBP et Bing restent des instruments distincts.
+Les commandes de soumission Indexing/IndexNow requièrent une autorisation
+nommée correspondant aux URL et à l'action, indépendamment des accès techniques.
+
+Les poids ci-dessous s'appliquent uniquement lorsque le contrat du projet
+autorise ces heuristiques ; ils ne constituent pas une mesure officielle.
 
 When the user invokes `/seo audit`, delegate to subagents in parallel:
 1. Detect business type (SaaS, local, ecommerce, publisher, agency, other)

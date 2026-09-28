@@ -9,7 +9,7 @@ argument-hint: "[url]"
 license: MIT
 metadata:
   author: AgriciDaniel
-  version: "2.2.0"
+  version: "2.2.1"
   category: seo
 ---
 
@@ -23,6 +23,22 @@ metadata:
 4. Always recommend JSON-LD as primary format (Google's stated preference)
 
 ## Validation
+
+Pour Next.js/React, valider le HTML réellement servi : le source TSX contenant
+`dangerouslySetInnerHTML` ne fournit pas la valeur JSON produite. Le hook renvoie
+`NOT_MEASURED` pour cette émission dynamique, sans bloquer l'édition. Une absence
+de résultat du hook ne prouve donc pas que le graphe est valide.
+
+Le validateur local parcourt les conteneurs `@graph`, transmet leur `@context`
+aux nœuds et accepte plusieurs types dans `@type`. Pour une capture HTML :
+
+```bash
+python3 skills/seo/hooks/validate-schema.py capture.html --json
+```
+
+Les états sont `VALID`, `INVALID`, `NOT_MEASURED` et `NOT_APPLICABLE`.
+`VALID` porte sur les contrôles locaux ci-dessous ; il ne prouve ni l'éligibilité
+aux résultats enrichis ni la consommation du graphe par un moteur.
 
 - Check required properties per schema type
 - Validate against Google's supported rich result types

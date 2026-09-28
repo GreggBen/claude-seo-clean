@@ -30,53 +30,122 @@ Note: matcher filters by tool name only (Edit, Write). The script itself
 checks if the file contains schema markup before validating.
 """
 
+import argparse
 import json
+import os
 import re
 import sys
-import os
+from html.parser import HTMLParser
 from typing import List
 
 
-def validate_jsonld(content: str) -> List[str]:
-    """Validate JSON-LD blocks in HTML content."""
+class _JsonLdParser(HTMLParser):
+    def __init__(self, source=False):
+        super().__init__(convert_charrefs=False)
+        self.source = source
+        self.blocks = []
+        self.parts = None
+        self.dynamic = 0
+
+    def handle_starttag(self, tag, attrs):
+        attributes = dict(attrs)
+        if tag == "script" and self._dynamic_type():
+            self.dynamic += 1
+            return
+        if tag == "script" and (attributes.get("type") or "").lower() == "application/ld+json":
+            if "dangerouslysetinnerhtml" in attributes:
+                self.dynamic += 1
+            else:
+                self.parts = []
+
+    def handle_startendtag(self, tag, attrs):
+        if tag == "script" and ((dict(attrs).get("type") or "").lower() == "application/ld+json" or self._dynamic_type()):
+            self.dynamic += 1
+
+    def _dynamic_type(self):
+        return self.source and bool(re.search(
+            r'''\btype\s*=\s*\{\s*["']application/ld\+json["']\s*\}''',
+            self.get_starttag_text() or "", re.IGNORECASE,
+        ))
+
+    def handle_data(self, data):
+        if self.parts is not None:
+            self.parts.append(data)
+
+    def handle_endtag(self, tag):
+        if tag == "script" and self.parts is not None:
+            self.blocks.append("".join(self.parts))
+            self.parts = None
+
+
+def inspect_jsonld(content: str, source: bool = False) -> dict:
+    """Distingue validation du HTML et émission dynamique non mesurable en source."""
+    parser = _JsonLdParser(source=source)
+    parser.feed(content)
+    parser.close()
     errors = []
-    pattern = r'<script\s+type=["\']application/ld\+json["\']\s*>(.*?)</script>'
-    blocks = re.findall(pattern, content, re.DOTALL | re.IGNORECASE)
-
-    if not blocks:
-        return []  # No schema found; not an error
-
-    for i, block in enumerate(blocks, 1):
-        block = block.strip()
+    source_expressions = 0
+    if parser.parts is not None:
+        errors.append("Unclosed JSON-LD script")
+    for i, block in enumerate(parser.blocks, 1):
         try:
-            data = json.loads(block)
+            data = json.loads(block.strip())
         except json.JSONDecodeError as e:
+            if source and re.match(r"\s*\{\s*[A-Za-z_$]", block):
+                source_expressions += 1
+                parser.dynamic += 1
+                continue
             errors.append(f"Block {i}: Invalid JSON; {e}")
             continue
-
         if isinstance(data, list):
-            for item in data:
-                errors.extend(_validate_schema_object(item, i))
-        elif isinstance(data, dict):
+            for index, item in enumerate(data):
+                errors.extend(_validate_schema_object(item, i, location=f"[{index}]"))
+        else:
             errors.extend(_validate_schema_object(data, i))
+    status = (
+        "INVALID" if errors else
+        "NOT_MEASURED" if parser.dynamic else
+        "VALID" if parser.blocks else "NOT_APPLICABLE"
+    )
+    return {"status": status, "blocks": len(parser.blocks) - source_expressions, "dynamic_blocks": parser.dynamic, "errors": errors}
 
-    return errors
+
+def validate_jsonld(content: str) -> List[str]:
+    return inspect_jsonld(content)["errors"]
 
 
-def _validate_schema_object(obj: dict, block_num: int) -> List[str]:
+def _validate_schema_object(obj, block_num: int, inherited_context=None, location="") -> List[str]:
     """Validate a single schema object."""
     errors = []
-    prefix = f"Block {block_num}"
+    prefix = f"Block {block_num}{location}"
+    if not isinstance(obj, dict):
+        return [f"{prefix}: Expected JSON-LD object"]
 
-    # Check @context
-    if "@context" not in obj:
+    context = obj.get("@context", inherited_context)
+    if context is None:
         errors.append(f"{prefix}: Missing @context")
-    elif obj["@context"] not in ("https://schema.org", "http://schema.org"):
+    elif context not in ("https://schema.org", "http://schema.org"):
         errors.append(f"{prefix}: @context should be 'https://schema.org'")
 
-    # Check @type
-    if "@type" not in obj:
+    if "@graph" in obj:
+        graph = obj["@graph"]
+        if not isinstance(graph, list):
+            errors.append(f"{prefix}: @graph must be an array")
+        else:
+            for index, node in enumerate(graph):
+                errors.extend(_validate_schema_object(
+                    node, block_num, context, f"{location}.@graph[{index}]",
+                ))
+    elif "@type" not in obj:
         errors.append(f"{prefix}: Missing @type")
+
+    schema_type = obj.get("@type", [])
+    types = [schema_type] if isinstance(schema_type, str) else schema_type
+    if not isinstance(types, list) or any(not isinstance(item, str) or not item for item in types):
+        errors.append(f"{prefix}: Invalid @type")
+        types = []
+    elif "@type" in obj and not types:
+        errors.append(f"{prefix}: Invalid @type")
 
     # Check for placeholder text
     placeholders = [
@@ -97,7 +166,6 @@ def _validate_schema_object(obj: dict, block_num: int) -> List[str]:
             errors.append(f"{prefix}: Contains placeholder text: {p}")
 
     # Check for deprecated types
-    schema_type = obj.get("@type", "")
     deprecated = {
         "HowTo": "deprecated September 2023",
         "SpecialAnnouncement": "deprecated July 31, 2025",
@@ -107,16 +175,18 @@ def _validate_schema_object(obj: dict, block_num: int) -> List[str]:
         "ClaimReview": "retired June 2025; fact-check rich results discontinued",
         "VehicleListing": "retired June 2025; vehicle listing structured data discontinued",
     }
-    if schema_type in deprecated:
-        errors.append(f"{prefix}: @type '{schema_type}' is {deprecated[schema_type]}")
+    for item in types:
+        if item in deprecated:
+            errors.append(f"{prefix}: @type '{item}' is {deprecated[item]}")
 
     # Check for restricted types used incorrectly.
     # FAQPage is intentionally NOT flagged: Google retired FAQ rich results for
     # all sites (May 7, 2026), but the markup still aids AI Mode / AI Overviews
     # entity resolution, so it is valid to ship. See skills/seo-schema/SKILL.md.
     restricted: dict = {}
-    if schema_type in restricted:
-        errors.append(f"{prefix}: @type '{schema_type}' is {restricted[schema_type]}; verify site qualifies")
+    for item in types:
+        if item in restricted:
+            errors.append(f"{prefix}: @type '{item}' is {restricted[item]}; verify site qualifies")
 
     return errors
 
@@ -125,7 +195,11 @@ def main():
     if len(sys.argv) < 2:
         sys.exit(0)
 
-    filepath = sys.argv[1]
+    parser = argparse.ArgumentParser(description="Validate JSON-LD in HTML or report dynamic source limits")
+    parser.add_argument("filepath")
+    parser.add_argument("--json", action="store_true")
+    args = parser.parse_args()
+    filepath = args.filepath
 
     if not os.path.isfile(filepath):
         sys.exit(0)
@@ -151,7 +225,16 @@ def main():
     except (OSError, IOError):
         sys.exit(0)
 
-    errors = validate_jsonld(content)
+    source_file = filepath.lower().endswith((".jsx", ".tsx", ".vue", ".svelte", ".php", ".ejs"))
+    report = inspect_jsonld(content, source=source_file)
+    errors = report["errors"]
+
+    if args.json:
+        print(json.dumps(report, ensure_ascii=False))
+        sys.exit(1 if errors else 0)
+
+    if report["dynamic_blocks"]:
+        print("NOT_MEASURED: dynamic JSON-LD source; validate the server-rendered HTML.")
 
     if not errors:
         sys.exit(0)

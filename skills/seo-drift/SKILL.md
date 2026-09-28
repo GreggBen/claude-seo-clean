@@ -12,7 +12,7 @@ license: MIT
 metadata:
   author: AgriciDaniel
   original_author: "Dan Colta (Pro Hub Challenge)"
-  version: "2.2.0"
+  version: "2.3.0"
   category: seo
 ---
 
@@ -29,6 +29,61 @@ Git for your SEO. Capture baselines, detect regressions, track changes over time
 | `/seo drift baseline <url>` | Capture current SEO state as a "known good" snapshot |
 | `/seo drift compare <url>` | Compare current page state to stored baseline |
 | `/seo drift history <url>` | Show change history and past comparisons |
+| `/seo drift migration <manifest.json>` | Comparer deux sites par URL et écarts approuvés |
+
+## Comparaison de migration
+
+```bash
+python3 skills/seo/scripts/migration_compare.py manifest.json --output rapport.json
+```
+
+Le manifeste désigne les origines et les chemins exacts, sans supprimer les
+slashes ni remplacer automatiquement les domaines dans les canonical ou graphes.
+Chaque exemption porte ses deux valeurs attendues, son autorité et sa preuve :
+
+```json
+{
+  "source_base": "https://source.example",
+  "target_base": "https://preview.example",
+  "pages": [{
+    "path": "/offres/",
+    "approved_differences": {
+      "x_robots_tag": {
+        "source": null,
+        "target": "noindex, nofollow",
+        "authority": "GREGG",
+        "evidence": "Référence de la décision autorisant la protection de la preview"
+      }
+    }
+  }]
+}
+```
+
+`source_frozen_at` peut renseigner le gel déclaré (ISO 8601 avec fuseau).
+Sans date, le rapport conserve `NOT_VERIFIED_IN_SESSION`. `target_path` permet
+de désigner un chemin cible différent. Les URL hors manifeste restent hors
+périmètre : aucune découverte exhaustive n'est revendiquée.
+
+Pour une preview protégée ou une reproduction hors réseau, ajouter
+`source_capture` et `target_capture` à chaque page : fichiers JSON relatifs au
+dossier du manifeste, issus de `fetch_page.fetch_page()`, avec `captured_at`
+et `requested_url` renseignés lors de la capture. Les captures et rapports
+restent dans un dossier privé ou ignoré par Git. Les en-têtes de session ne
+sont pas repris dans le rapport ; aucun contournement d'authentification n'est effectué.
+
+Le rapport compare statut HTTP, chemin et origine finaux, redirections, titre,
+description, canonical, robots HTML/HTTP, h1–h3, JSON-LD, Open Graph, cache et
+type de contenu. Une absence observée demeure `null` ; un accès 401/403, une
+capture manquante ou un JSON-LD invalide empêche un résultat de parité.
+
+- Code 0 : `MATCH` ou `MATCH_WITH_APPROVED_DIFFERENCES`.
+- Code 1 : `DIFFERENCES` (écart inattendu ou exemption devenue inutilisée).
+- Code 2 : `NOT_MEASURED` ou erreur de manifeste.
+
+Le rapport fournit version/hash du script, hash du manifeste et des captures,
+dates, écarts et références d'approbation. Il valide uniquement les éléments
+observés ; rendu JavaScript, crawl, indexation et audience restent non mesurés.
+Les références d'approbation sont déclarées, non authentifiées par l'outil.
 
 ---
 

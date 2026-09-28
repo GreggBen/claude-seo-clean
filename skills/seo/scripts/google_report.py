@@ -55,6 +55,19 @@ BRAND = {
 }
 
 
+def _gsc_metric(value, format_spec=","):
+    return format(value, format_spec) if value is not None else "NOT_AVAILABLE"
+
+
+def _gsc_ctr(value, unit="percent"):
+    # Le producteur historique exprime déjà le CTR en points de pourcentage.
+    if unit not in ("percent", "ratio"):
+        raise ValueError(f"Unsupported GSC CTR unit: {unit!r}")
+    if value is None:
+        return "NOT_AVAILABLE"
+    return f"{value * 100 if unit == 'ratio' else value:.2f}%"
+
+
 def _score_color(score):
     """Return brand color based on Lighthouse-style score thresholds."""
     if score >= 90:
@@ -288,14 +301,16 @@ def chart_top_queries(data: dict, output_dir: Path) -> str:
         return ""
 
     # Sort by impressions (more meaningful than clicks for new sites)
-    top = sorted(rows, key=lambda r: r.get("impressions", 0), reverse=True)[:12]
-    top = [r for r in top if r.get("impressions", 0) > 0]
+    measured = [r for r in rows if r.get("impressions") is not None]
+    top = sorted(measured, key=lambda r: r["impressions"], reverse=True)[:12]
+    top = [r for r in top if r["impressions"] > 0]
     if not top:
         return ""
 
     labels = [r.get("query", r.get("keys", ["?"])[0])[:35] for r in top]
     impressions = [r.get("impressions", 0) for r in top]
-    clicks = [r.get("clicks", 0) for r in top]
+    clicks = [r.get("clicks") for r in top]
+    known_clicks = [c for c in clicks if c is not None]
 
     if not impressions or max(impressions) < 3:
         return ""
@@ -303,7 +318,7 @@ def chart_top_queries(data: dict, output_dir: Path) -> str:
     fig, ax = plt.subplots(figsize=(7, max(2, len(labels) * 0.3)))
     y = range(len(labels))
     bars = ax.barh(y, impressions, color=BRAND["primary"], height=0.55, label="Impressions")
-    if any(c > 0 for c in clicks):
+    if len(known_clicks) == len(clicks) and any(c > 0 for c in known_clicks):
         ax.barh(y, clicks, color=BRAND["success"], height=0.55, label="Clicks")
         ax.legend(fontsize=8, loc="lower right")
     ax.set_yticks(y)
@@ -312,9 +327,9 @@ def chart_top_queries(data: dict, output_dir: Path) -> str:
     ax.invert_yaxis()
 
     for bar, val in zip(bars, clicks):
-        if val > 0:
+        if val is not None and val > 0:
             ax.text(
-                bar.get_width() + max(clicks) * 0.02,
+                bar.get_width() + max(known_clicks) * 0.02,
                 bar.get_y() + bar.get_height() / 2,
                 str(val), va="center", fontsize=8, color=BRAND["dark"],
             )
@@ -1197,12 +1212,12 @@ def _build_executive_summary(domain, timestamp, data, report_type):
         cards.append(("seo", f"{seo_score}/100", "Lighthouse SEO", color))
 
     # GSC totals
-    gsc = data.get("gsc", {})
+    gsc = data.get("gsc", data if report_type == "gsc-performance" else {})
     if gsc.get("totals"):
-        clicks = gsc["totals"].get("clicks", 0)
-        cards.append(("clicks", f"{clicks:,}", "Total Clicks", BRAND["primary"]))
-        impr = gsc["totals"].get("impressions", 0)
-        cards.append(("impr", f"{impr:,}", "Impressions", BRAND["secondary"]))
+        clicks = gsc["totals"].get("clicks")
+        cards.append(("clicks", _gsc_metric(clicks), "Total Clicks", BRAND["primary"]))
+        impr = gsc["totals"].get("impressions")
+        cards.append(("impr", _gsc_metric(impr), "Impressions", BRAND["secondary"]))
 
     # Indexation
     inspection = data.get("inspection", {})
@@ -1553,21 +1568,32 @@ def _build_gsc_section(gsc_data, chart_paths, section_num=3, fig_start=1):
 
     totals = gsc_data.get("totals", {})
     dr = gsc_data.get("date_range", {})
+    ctr_unit = gsc_data.get("ctr_unit", "percent")
+    state = gsc_data.get("status", "ERROR" if gsc_data.get("error") else "NOT_AVAILABLE")
+    source = gsc_data.get("totals_source") or "NOT_AVAILABLE"
+    totals_state = gsc_data.get("totals_status", "NOT_AVAILABLE")
+    lines.append(f'  <p>État : {escape(state)} | Totaux : {escape(totals_state)} '
+                 f'| Source : {escape(source)}</p>')
+    error = gsc_data.get("error") or gsc_data.get("totals_error")
+    if error:
+        lines.append(f'  <p class="warning">{escape(str(error))}</p>')
+    for limit in gsc_data.get("limits", []):
+        lines.append(f'  <p class="warning">{escape(str(limit))}</p>')
 
     if totals:
         domain = gsc_data.get("property", "?")
         lines.append(f'  <p>Period: {dr.get("start", "?")} to {dr.get("end", "?")} '
                      f'| Property: {domain}</p>')
-        queries_count = gsc_data.get("row_count", 0)
-        impr_total = totals.get("impressions", 0)
-        lines.append(f'  <p><strong>{domain}</strong> appeared in <strong>{queries_count}</strong> unique search queries '
-                     f'with <strong>{impr_total:,}</strong> total impressions during this period.</p>')
+        queries_count = gsc_data.get("row_count")
+        impr_total = totals.get("impressions")
+        lines.append(f'  <p>Lignes retournées : <strong>{_gsc_metric(queries_count)}</strong> '
+                     f'| Impressions : <strong>{_gsc_metric(impr_total)}</strong>.</p>')
         lines.append('')
 
-        clicks_val = f'{totals.get("clicks", 0):,}'
-        impr_val = f'{totals.get("impressions", 0):,}'
-        ctr_val = f'{totals.get("ctr", 0)}%'
-        rows_val = str(gsc_data.get("row_count", 0))
+        clicks_val = _gsc_metric(totals.get("clicks"))
+        impr_val = _gsc_metric(totals.get("impressions"))
+        ctr_val = _gsc_ctr(totals.get("ctr"), ctr_unit)
+        rows_val = _gsc_metric(queries_count)
 
         # Metric cards in single row
         lines.append(f'  <h3>{section_num}.1 Key Metrics</h3>')
@@ -1575,7 +1601,7 @@ def _build_gsc_section(gsc_data, chart_paths, section_num=3, fig_start=1):
         lines.append(f'    <div class="col">{_metric_card(clicks_val, "Total Clicks", BRAND["primary"])}</div>')
         lines.append(f'    <div class="col">{_metric_card(impr_val, "Total Impressions", BRAND["secondary"])}</div>')
         lines.append(f'    <div class="col">{_metric_card(ctr_val, "Average CTR", BRAND["accent"])}</div>')
-        lines.append(f'    <div class="col">{_metric_card(rows_val, "Queries Found", BRAND["dark"])}</div>')
+        lines.append(f'    <div class="col">{_metric_card(rows_val, "Lignes retournées", BRAND["dark"])}</div>')
         lines.append('  </div>')
         lines.append('  <hr class="divider">')
         lines.append('')
@@ -1601,26 +1627,27 @@ def _build_gsc_section(gsc_data, chart_paths, section_num=3, fig_start=1):
                      '<th>Impressions</th><th>CTR</th><th>Position</th></tr>')
         lines.append('    </thead>')
         lines.append('    <tbody>')
-        sorted_rows = sorted(rows, key=lambda r: r.get("impressions", 0), reverse=True)
+        sorted_rows = sorted(rows, key=lambda r: r.get("impressions") or 0, reverse=True)
         for i, r in enumerate(sorted_rows[:15], 1):
             query = r.get("query", r.get("keys", ["?"])[0])
-            pos = r.get("position", 0)
-            pos_cls = ("status-pass" if pos <= 3
-                       else ("status-warn" if pos <= 10 else "status-fail"))
+            pos = r.get("position")
+            pos_cls = ("status-unknown" if pos is None else ("status-pass" if pos <= 3
+                       else ("status-warn" if pos <= 10 else "status-fail")))
             lines.append(f'      <tr><td>{i}</td><td>{query}</td>'
-                         f'<td>{r.get("clicks", 0)}</td>'
-                         f'<td>{r.get("impressions", 0):,}</td>')
-            lines.append(f'      <td>{r.get("ctr", 0)}%</td>'
-                         f'<td class="{pos_cls}">{pos:.1f}</td></tr>')
+                         f'<td>{_gsc_metric(r.get("clicks"))}</td>'
+                         f'<td>{_gsc_metric(r.get("impressions"))}</td>')
+            lines.append(f'      <td>{_gsc_ctr(r.get("ctr"), ctr_unit)}</td>'
+                         f'<td class="{pos_cls}">{_gsc_metric(pos, ".1f")}</td></tr>')
         lines.append('    </tbody>')
         lines.append('  </table>')
         lines.append('')
 
     # Position analysis
-    if rows:
-        top3 = len([r for r in rows if r.get("position", 99) <= 3])
-        top10 = len([r for r in rows if r.get("position", 99) <= 10])
-        beyond = len([r for r in rows if r.get("position", 99) > 10])
+    positions = [r["position"] for r in rows if r.get("position") is not None]
+    if positions:
+        top3 = sum(pos <= 3 for pos in positions)
+        top10 = sum(pos <= 10 for pos in positions)
+        beyond = sum(pos > 10 for pos in positions)
         lines.append(f'  <h3>{section_num}.4 Query Position Analysis</h3>')
         lines.append('  <div class="two-col">')
         lines.append(f'    <div class="col">')
@@ -1651,9 +1678,9 @@ def _build_gsc_section(gsc_data, chart_paths, section_num=3, fig_start=1):
         for w in qw:
             query = w.get("keys", ["?"])[0] if w.get("keys") else w.get("query", "?")
             lines.append(f'      <tr><td>{query}</td>'
-                         f'<td>{w.get("position", 0):.1f}</td>'
-                         f'<td>{w.get("impressions", 0):,}</td>'
-                         f'<td>{w.get("clicks", 0)}</td></tr>')
+                         f'<td>{_gsc_metric(w.get("position"), ".1f")}</td>'
+                         f'<td>{_gsc_metric(w.get("impressions"))}</td>'
+                         f'<td>{_gsc_metric(w.get("clicks"))}</td></tr>')
         lines.append('    </tbody>')
         lines.append('  </table>')
         lines.append('')
@@ -2106,12 +2133,12 @@ def generate_report(report_type, data, domain, output_dir, output_format="pdf"):
     # ── GSC-PERFORMANCE report ───────────────────────────────────────────────
     elif report_type == "gsc-performance":
         gsc = data.get("gsc", data)
-        clicks = gsc.get("totals", {}).get("clicks", 0)
+        clicks = gsc.get("totals", {}).get("clicks")
 
         sections.append(_build_title_page(
             domain, "Search Console Performance",
             "Google Search Analytics Report",
-            score=f"{clicks:,}",
+            score=_gsc_metric(clicks),
             score_label="Total Clicks",
             meta_items=[timestamp, "Google Search Console API"],
         ))
@@ -2503,7 +2530,17 @@ def generate_xlsx(data, domain, report_type, output_dir):
     _auto_width(ws)
 
     # ── GSC Queries Sheet ─────────────────────────────────────────────────────
-    gsc = data.get("gsc", {})
+    gsc = data.get("gsc", data if report_type == "gsc-performance" else {})
+    ctr_unit = gsc.get("ctr_unit", "percent")
+    if gsc:
+        ws.append(["GSC status", gsc.get("status", "NOT_AVAILABLE")])
+        ws.append(["GSC totals status", gsc.get("totals_status", "NOT_AVAILABLE")])
+        ws.append(["GSC totals source", gsc.get("totals_source") or "NOT_AVAILABLE"])
+        if gsc.get("error") or gsc.get("totals_error"):
+            ws.append(["GSC error", gsc.get("error") or gsc.get("totals_error")])
+        for limit in gsc.get("limits", []):
+            ws.append(["GSC limit", limit])
+        _auto_width(ws)
     queries = gsc.get("queries", gsc.get("rows", []))
     if queries and isinstance(queries, list):
         ws2 = wb.create_sheet("Queries")
@@ -2515,10 +2552,10 @@ def generate_xlsx(data, domain, report_type, output_dir):
                 query = keys[0] if keys else row_data.get("query", "")
                 ws2.append([
                     query,
-                    row_data.get("clicks", 0),
-                    row_data.get("impressions", 0),
-                    f"{row_data.get('ctr', 0):.2%}" if isinstance(row_data.get("ctr"), (int, float)) else str(row_data.get("ctr", "")),
-                    round(row_data.get("position", 0), 1) if isinstance(row_data.get("position"), (int, float)) else row_data.get("position", ""),
+                    row_data.get("clicks") if row_data.get("clicks") is not None else "NOT_AVAILABLE",
+                    row_data.get("impressions") if row_data.get("impressions") is not None else "NOT_AVAILABLE",
+                    _gsc_ctr(row_data.get("ctr"), ctr_unit),
+                    round(row_data["position"], 1) if row_data.get("position") is not None else "NOT_AVAILABLE",
                 ])
         ws2.auto_filter.ref = f"A1:E{ws2.max_row}"
         ws2.freeze_panes = "A2"
@@ -2536,10 +2573,10 @@ def generate_xlsx(data, domain, report_type, output_dir):
                 page = keys[0] if keys else row_data.get("page", "")
                 ws3.append([
                     page,
-                    row_data.get("clicks", 0),
-                    row_data.get("impressions", 0),
-                    f"{row_data.get('ctr', 0):.2%}" if isinstance(row_data.get("ctr"), (int, float)) else str(row_data.get("ctr", "")),
-                    round(row_data.get("position", 0), 1) if isinstance(row_data.get("position"), (int, float)) else row_data.get("position", ""),
+                    row_data.get("clicks") if row_data.get("clicks") is not None else "NOT_AVAILABLE",
+                    row_data.get("impressions") if row_data.get("impressions") is not None else "NOT_AVAILABLE",
+                    _gsc_ctr(row_data.get("ctr"), ctr_unit),
+                    round(row_data["position"], 1) if row_data.get("position") is not None else "NOT_AVAILABLE",
                 ])
         ws3.auto_filter.ref = f"A1:E{ws3.max_row}"
         ws3.freeze_panes = "A2"

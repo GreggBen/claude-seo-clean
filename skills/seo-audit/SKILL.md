@@ -6,13 +6,19 @@ argument-hint: "[url]"
 license: MIT
 metadata:
   author: AgriciDaniel
-  version: "2.2.0"
+  version: "2.2.1"
   category: seo
 ---
 
 # Full Website SEO Audit
 
 ## Process
+
+Le contrat de rapport défini dans `../seo/SKILL.md` prime sur les étapes de
+scoring et les exemples d'enveloppe ci-dessous. Pour un projet interdisant les
+agrégats, omettre `health_score` et les champs de scores des catégories : rendre
+les constats, leurs preuves et leurs limites. Ne pas utiliser le générateur de
+rapport `full` s'il réintroduit ces agrégats ; rendre les constats directement.
 
 1. **Render homepage**: use `python3 scripts/render_page.py <url> --mode auto --json` to capture raw HTML, rendered HTML, extracted text, SPA status, and accessibility data when needed
 2. **Detect business type**: analyze homepage signals per seo orchestrator

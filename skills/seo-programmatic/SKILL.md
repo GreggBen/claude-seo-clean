@@ -11,7 +11,7 @@ argument-hint: "[url or plan]"
 license: MIT
 metadata:
   author: AgriciDaniel
-  version: "2.2.0"
+  version: "2.2.1"
   category: seo
 ---
 
@@ -119,10 +119,12 @@ Measure against all other pages in the programmatic set. Shared headers, footers
 ## Canonical Strategy
 
 - Every programmatic page must have a self-referencing canonical tag
-- Parameter variations (sort, filter, pagination) canonical to the base URL
-- Paginated series: canonical to page 1 or use rel=next/prev
+- Variantes de tri et filtre : évaluer leur contenu et l'intention d'indexation avant de choisir canonical ou noindex ; ne pas assimiler la pagination à un doublon.
+- Séries paginées : URL et canonical propres à chaque page, liens séquentiels `<a href>`. Google n'utilise plus `rel=next/prev` pour ces relations.
 - If programmatic pages overlap with manual pages, the manual page is canonical
 - No canonical to a different domain unless intentional cross-domain setup
+
+Source vérifiée le 2026-09-28 : [pagination, Google Search Central](https://developers.google.com/search/docs/specialty/ecommerce/pagination-and-incremental-page-loading). Un canonical est un signal, pas une garantie d'indexation.
 
 ## Sitemap Integration
 
@@ -137,7 +139,7 @@ Measure against all other pages in the programmatic set. Shared headers, footers
 ## Index Bloat Prevention
 
 - **Noindex low-value pages**: Pages that don't meet quality gates
-- **Pagination**: Noindex paginated results beyond page 1 (or use rel=next/prev)
+- **Pagination** : ne pas appliquer un noindex systématique après la première page ; conserver les liens de découverte et documenter toute exclusion intentionnelle selon le contenu et l'usage.
 - **Faceted navigation**: Noindex filtered views, canonical to base category
 - **Crawl budget**: For sites with >10k programmatic pages, monitor crawl stats in Search Console
 - **Thin page consolidation**: Merge records with insufficient data into aggregated pages

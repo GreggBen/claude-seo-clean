@@ -111,9 +111,9 @@
 ## Technical Considerations
 
 ### Pagination
-- Use rel="next"/rel="prev" or load-more
-- Ensure all products are crawlable
-- Canonical to main category page
+- Chaque page de résultats distincts possède son URL et son canonical ; ne pas la canonicaliser vers la catégorie principale.
+- Relier la suite par `<a href>` même avec « charger plus » : Google ne clique pas les boutons.
+- Google n'utilise plus `rel=next/prev` pour la pagination. Source vérifiée le 2026-09-28 : [Google Search Central](https://developers.google.com/search/docs/specialty/ecommerce/pagination-and-incremental-page-loading). La découverte ne garantit pas l'indexation.
 
 ### Faceted Navigation
 - Noindex filter combinations that create duplicate content

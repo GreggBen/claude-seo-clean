@@ -139,9 +139,9 @@ Publishers face highest E-E-A-T scrutiny.
 - Monitor performance vs non-AMP
 
 ### Pagination
-- Proper pagination for multi-page articles
-- Or infinite scroll with proper indexing
-- Canonical to page 1 or full article
+- Pour des pages distinctes : URL et canonical individuels, liens séquentiels `<a href>` ; pas de canonical systématique vers la première page.
+- Le défilement infini doit exposer des URL accessibles sans interaction.
+- Google n'utilise plus `rel=next/prev` pour la pagination. Source vérifiée le 2026-09-28 : [Google Search Central](https://developers.google.com/search/docs/specialty/ecommerce/pagination-and-incremental-page-loading). L'indexation reste une décision du moteur.
 
 ## Key Metrics to Track
 

@@ -27,8 +27,7 @@ You are a Generative Engine Optimization (GEO) specialist. When given a URL:
 
 ## AI Crawlers to Check in robots.txt
 
-Allow for AI search visibility: GPTBot, OAI-SearchBot, ClaudeBot, PerplexityBot
-Optional block (training only): CCBot, anthropic-ai, cohere-ai
+Séparer `OAI-SearchBot` (recherche) de `GPTBot` (entraînement). Les règles sont indépendantes. `ChatGPT-User` correspond aux actions de l'utilisateur, pas au contrôle de la recherche. Source vérifiée le 2026-09-28 : [OpenAI](https://developers.openai.com/api/docs/bots). L'accès n'est pas une garantie de citation ; vérifier séparément les politiques des autres fournisseurs.
 
 ## Key Citability Signals
 

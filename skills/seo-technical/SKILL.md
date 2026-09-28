@@ -10,7 +10,7 @@ argument-hint: "[url]"
 license: MIT
 metadata:
   author: AgriciDaniel
-  version: "2.2.0"
+  version: "2.2.1"
   category: seo
 ---
 
@@ -35,7 +35,8 @@ As of 2025-2026, AI companies actively crawl the web to train models and power A
 | Crawler | Company | robots.txt token | Purpose |
 |---------|---------|-----------------|---------|
 | GPTBot | OpenAI | `GPTBot` | Model training |
-| ChatGPT-User | OpenAI | `ChatGPT-User` | Real-time browsing |
+| OAI-SearchBot | OpenAI | `OAI-SearchBot` | Recherche ChatGPT |
+| ChatGPT-User | OpenAI | `ChatGPT-User` | Actions déclenchées par un utilisateur |
 | ClaudeBot | Anthropic | `ClaudeBot` | Model training |
 | PerplexityBot | Perplexity | `PerplexityBot` | Search index + training |
 | Bytespider | ByteDance | `Bytespider` | Model training |
@@ -44,7 +45,7 @@ As of 2025-2026, AI companies actively crawl the web to train models and power A
 
 **Key distinctions:**
 - Blocking `Google-Extended` prevents Gemini training use but does NOT affect Google Search indexing or AI Overviews (those use `Googlebot`)
-- Blocking `GPTBot` prevents OpenAI training but does NOT prevent ChatGPT from citing your content via browsing (`ChatGPT-User`)
+- Les règles `GPTBot` (entraînement) et `OAI-SearchBot` (recherche) sont indépendantes. `ChatGPT-User` ne contrôle pas l'inclusion dans la recherche ; ses actions initiées par l'utilisateur peuvent ne pas suivre robots.txt.
 - ~3-5% of websites now use AI-specific robots.txt rules
 
 **Example, selective AI crawler blocking:**
@@ -64,15 +65,17 @@ User-agent: *
 Allow: /
 ```
 
-**Recommendation:** Consider your AI visibility strategy before blocking. Being cited by AI systems drives brand awareness and referral traffic. Cross-reference the `seo-geo` skill for full AI visibility optimization.
+**Recommandation :** décider séparément l'accès pour la recherche et l'utilisation pour l'entraînement. Autoriser un robot ne garantit ni exploration ni citation. Source OpenAI vérifiée le 2026-09-28 : [rôles des robots et limites de robots.txt](https://developers.openai.com/api/docs/bots). Vérifier la documentation de chaque autre fournisseur avant de modifier ses règles.
 
 ### 2. Indexability
 - Canonical tags: self-referencing, no conflicts with noindex
 - Duplicate content: near-duplicates, parameter URLs, www vs non-www
 - Thin content: pages below minimum word counts per type
-- Pagination: rel=next/prev or load-more pattern
+- Pagination : URL et canonical propres à chaque page, liens séquentiels `<a href>` ; un bouton « charger plus » seul ne suffit pas à découvrir la suite. Google n'utilise plus `rel=next/prev` pour la pagination.
 - Hreflang: correct for multi-language/multi-region sites
 - Index bloat: unnecessary pages consuming crawl budget
+
+Source pagination vérifiée le 2026-09-28 : [Google Search Central](https://developers.google.com/search/docs/specialty/ecommerce/pagination-and-incremental-page-loading). Ces contrôles portent sur la découverte et les signaux servis, sans garantir l'indexation.
 
 ### 3. Security
 - HTTPS: enforced, valid SSL certificate, no mixed content

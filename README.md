@@ -48,7 +48,10 @@ Puis, dans Claude Code :
 
 **Connexion Google (per-user, gratuite)** : les skills qui utilisent Search Console / PageSpeed /
 CrUX / GA4 (`seo-google`) s'authentifient avec **ton propre compte Google** via OAuth. Ton token
-reste **sur ta machine** (chiffré, `0600`). Aucune clé partagée, aucune donnée qui passe par un tiers.
+reste **sur ta machine** dans un fichier JSON non chiffré ; le script applique les permissions
+`0600` lorsque le système de fichiers les prend en charge (`skills/seo/scripts/google_auth.py`,
+`_save_oauth_token`). Ces permissions limitent l'accès local, sans chiffrer le contenu.
+Aucune clé partagée ; les requêtes utilisent directement les API Google configurées.
 La 1ʳᵉ utilisation te guide pour créer un projet Google Cloud et activer les APIs (gratuit).
 
 Les skills **prompt-only** (`seo-schema`, `seo-geo`, `seo-content`) marchent **sans aucune config**.
