@@ -79,11 +79,6 @@ the full algorithm.
 - Only cross-check group boundary keywords
 - Skip pairs where both are long-tail variants of the same head term (assume same cluster)
 
-**DataForSEO integration:** If DataForSEO MCP is available, use `serp_organic_live_advanced`
-instead of WebSearch for SERP data. Run `python3 scripts/dataforseo_costs.py check serp_organic_live_advanced --count N`
-before each batch. If `"status": "needs_approval"`, show cost estimate and ask user.
-If `"status": "blocked"`, fall back to WebSearch.
-
 ### Step 3: Intent Classification
 
 Classify each keyword into one of four intent categories:
@@ -285,7 +280,6 @@ All outputs are written to the current working directory:
 | `seo-plan` | Import source: strategy import reads seo-plan output |
 | `seo-content` | Quality check: E-E-A-T validation of generated content |
 | `seo-schema` | Schema markup: Article, BreadcrumbList, ItemList for cluster pages |
-| `seo-dataforseo` | Data source: SERP data when DataForSEO MCP is available |
 | `seo-google` | Reporting: generate PDF report of cluster plan and scorecard |
 
 After cluster planning or execution completes, offer:
@@ -299,11 +293,10 @@ After cluster planning or execution completes, offer:
 |-------|-------|------------|
 | "No seed keyword provided" | Missing argument | Prompt user for seed keyword or URL |
 | "Insufficient keyword variants" | Expansion yielded < 15 keywords | Run second expansion pass with PAA questions |
-| "SERP data unavailable" | WebSearch and DataForSEO both failing | Retry after 30s; if persistent, use intent-only clustering with warning |
+| "SERP data unavailable" | WebSearch unavailable | Use intent-only clustering and disclose the limitation |
 | "No strategy file found" | `--from strategy` but no plan exists | Prompt user to run `/seo plan` first |
 | "cluster-plan.json not found" | Execute without planning | Prompt user to run `/seo cluster plan` first |
 | "claude-blog not installed" | Execute attempted without blog skill | Generate content briefs instead; suggest installation |
-| "DataForSEO budget exceeded" | Cost check returned "blocked" | Fall back to WebSearch; inform user |
 | "Duplicate primary keywords" | Cannibalization detected | Merge affected posts or reassign keywords |
 | "Orphan page detected" | Post missing incoming links | Add links from nearest cluster siblings |
 | "Resume state corrupted" | Mismatch between plan and output | Rebuild state from output directory scan |
@@ -312,10 +305,9 @@ After cluster planning or execution completes, offer:
 
 ## Security
 
-- All URLs fetched via `python3 scripts/render_page.py --mode auto` (SPA-aware SSRF protection via `url_safety`)
+- All URLs fetched via `~/.claude/skills/seo/run-script render_page.py --mode auto` (SPA-aware SSRF protection via `url_safety`)
 - No credentials stored or transmitted
 - Output files contain no PII or API keys
-- DataForSEO cost checks run before every API call
 
 ## FLOW Framework Integration
 

@@ -34,7 +34,7 @@ Git for your SEO. Capture baselines, detect regressions, track changes over time
 ## Comparaison de migration
 
 ```bash
-python3 skills/seo/scripts/migration_compare.py manifest.json --output rapport.json
+~/.claude/skills/seo/run-script migration_compare.py manifest.json --output rapport.json
 ```
 
 Le manifeste désigne les origines et les chemins exacts, sans supprimer les
@@ -158,8 +158,8 @@ Captures the current state of a page and stores it.
 
 **Execution:**
 ```bash
-python3 scripts/drift_baseline.py <url>
-python3 scripts/drift_baseline.py <url> --skip-cwv
+~/.claude/skills/seo/run-script drift_baseline.py <url>
+~/.claude/skills/seo/run-script drift_baseline.py <url> --skip-cwv
 ```
 
 **Output:** JSON with baseline ID, timestamp, URL, and summary of captured elements.
@@ -181,16 +181,16 @@ Fetches the current page state and diffs it against the most recent baseline.
 
 **Execution:**
 ```bash
-python3 scripts/drift_compare.py <url>
-python3 scripts/drift_compare.py <url> --baseline-id 5
-python3 scripts/drift_compare.py <url> --skip-cwv
+~/.claude/skills/seo/run-script drift_compare.py <url>
+~/.claude/skills/seo/run-script drift_compare.py <url> --baseline-id 5
+~/.claude/skills/seo/run-script drift_compare.py <url> --skip-cwv
 ```
 
 **Output:** JSON with all triggered rules, old/new values, severity, and actions.
 
 After comparison, offer to generate an HTML report:
 ```bash
-python3 scripts/drift_report.py <comparison_json_file> --output drift-report.html
+~/.claude/skills/seo/run-script drift_report.py <comparison_json_file> --output drift-report.html
 ```
 
 ---
@@ -201,8 +201,8 @@ Shows all baselines and comparisons for a URL.
 
 **Execution:**
 ```bash
-python3 scripts/drift_history.py <url>
-python3 scripts/drift_history.py <url> --limit 10
+~/.claude/skills/seo/run-script drift_history.py <url>
+~/.claude/skills/seo/run-script drift_history.py <url> --limit 10
 ```
 
 **Output:** JSON array of baselines (newest first) with timestamps and comparison summaries.

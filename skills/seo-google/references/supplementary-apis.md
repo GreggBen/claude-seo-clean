@@ -66,7 +66,8 @@ Programmatic Google search results (limited).
 - **CLOSED to new customers as of 2025.** Existing customers must migrate by January 2027.
 - 100 queries/day free, $5 per 1,000 up to 10,000/day
 
-**For SERP data, prefer DataForSEO** (`/seo dataforseo serp`) which has no such limitations.
+For owned properties, use Search Console performance data. For comparative
+SERP observations, use web search and disclose coverage and freshness limits.
 
 ---
 

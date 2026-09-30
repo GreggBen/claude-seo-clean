@@ -423,7 +423,7 @@ def run_oauth_flow(creds_path: str):
         print("\nAuthentication failed or timed out.", file=sys.stderr)
         print("If the browser showed 'localhost refused to connect', copy the full URL")
         print("from the browser address bar and run:")
-        print(f"  python scripts/google_auth.py --exchange --creds {creds_path} --code 'THE_CODE'")
+        print(f"  ~/.claude/skills/seo/run-script google_auth.py --exchange --creds {creds_path} --code 'THE_CODE'")
         sys.exit(1)
 
     # Exchange code for tokens
@@ -604,7 +604,7 @@ def check_credentials(service: str) -> dict:
             if not sa_path:
                 result["error"] = (
                     "No OAuth token or service account found. Either:\n"
-                    "         1. Run: python scripts/google_auth.py --auth --creds /path/to/client_secret.json\n"
+                    "         1. Run: ~/.claude/skills/seo/run-script google_auth.py --auth --creds /path/to/client_secret.json\n"
                     f"         2. Or add 'service_account_path' to {CONFIG_PATH}"
                 )
             else:
@@ -769,7 +769,7 @@ Google SEO API Setup Instructions
    }
 
 7. VERIFY
-   python scripts/google_auth.py --check
+   ~/.claude/skills/seo/run-script google_auth.py --check
 
 ENVIRONMENT VARIABLE ALTERNATIVES:
    GOOGLE_API_KEY              - API key

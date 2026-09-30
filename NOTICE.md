@@ -14,9 +14,12 @@ Le texte complet de la licence MIT originale est conservé dans `LICENSE`, confo
   bing-webmaster, profound, seranking, unlighthouse) — aucune clé API, aucune entrée MCP.
 - **Retrait** des 2 skills inertes sans extension payante : `seo-dataforseo`, `seo-image-gen`.
 - **Retrait** des scripts propres à ces extensions (`dataforseo_*.py`, `unlighthouse_run.py`).
+- **Retrait** des références inactives consacrées aux API payantes de cartes et de marketplaces.
 - Le **hook** de validation schema.org est fourni mais **non câblé** (ne s'exécute pas
   automatiquement — pas de comportement d'arrière-plan par défaut).
 - Ajout de ce `NOTICE.md`, d'un `README.md` réécrit et d'un `install.sh` qui **ne câble aucun hook**.
 
 Aucune revendication de propriété sur le code original : le crédit revient à son auteur.
-Les modifications ci-dessus sont publiées sous la même licence MIT.
+Les modifications ci-dessus sont publiées sous la même licence MIT. Les contenus
+FLOW dans `skills/seo-flow/references/` conservent leur licence CC BY 4.0 et
+leur attribution à Daniel Agrici, telles qu'indiquées dans leurs fichiers.

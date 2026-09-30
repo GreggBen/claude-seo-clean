@@ -12,11 +12,11 @@ Usage
 
 Generate a manifest for the current working tree::
 
-    python scripts/release_sign.py > release-manifest.json
+    ~/.claude/skills/seo/run-script release_sign.py > release-manifest.json
 
 Compare two manifests to find drift between releases::
 
-    python scripts/release_sign.py --compare old.json new.json
+    ~/.claude/skills/seo/run-script release_sign.py --compare old.json new.json
 
 Threat model
 ============

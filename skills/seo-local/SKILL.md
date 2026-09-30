@@ -59,6 +59,13 @@ Detect from page signals before analysis. This determines which checks apply.
 
 **Impact on checks**: SABs skip embedded map verification and physical address consistency. Brick-and-mortar gets full NAP + map checks.
 
+For directories and marketplaces, trace every location link and sitemap URL back to
+the same eligible records that the destination page displays. Check verification,
+publication and moderation gates, the minimum number of visible results, and whether
+the route returns a usable page or `notFound`. A city slug in the database alone does
+not establish a useful indexable location page. Keep claims such as "verified" tied to
+the records for which that status is actually known.
+
 ---
 
 ## Industry Vertical Detection
@@ -263,7 +270,7 @@ Generate `LOCAL-SEO-ANALYSIS-{domain}.md` with:
 8. **Local schema status** (present/missing/malformed + ready-to-use fix)
 9. **Location page quality** (if multi-location: unique content %, doorway risk, store locator)
 10. **Top 10 prioritized actions** (Critical > High > Medium > Low)
-11. **Limitations disclaimer**: What this analysis could NOT assess (geo-grid ranking, Domain Authority, comprehensive backlinks, GBP Insights data, real-time local pack position) and which paid tools can fill those gaps
+11. **Limitations disclaimer**: What this analysis could NOT assess (geo-grid ranking, Domain Authority, comprehensive backlinks, GBP Insights data, real-time local pack position)
 
 ---
 
@@ -293,12 +300,6 @@ Generate `LOCAL-SEO-ANALYSIS-{domain}.md` with:
 3. Establish presence on platforms ChatGPT sources from (Yelp, TripAdvisor, BBB, Reddit)
 4. Pursue Chamber of Commerce and BBB membership (authority + verification signals)
 5. Create community involvement content (sponsorships, local events, partnerships)
-
----
-
-## DataForSEO Integration (Optional)
-
-If DataForSEO MCP tools are available, use `local_business_data` for live GBP data extraction, `google_local_pack_serp` for real-time local pack positions, and `business_listings` for automated citation auditing across directories.
 
 ---
 

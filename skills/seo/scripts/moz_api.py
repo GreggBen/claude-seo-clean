@@ -392,7 +392,7 @@ def main():
         result = {
             "status": "error",
             "data": None,
-            "error": "No Moz API key configured. Run: python scripts/backlinks_auth.py --setup",
+            "error": "No Moz API key configured. Run: ~/.claude/skills/seo/run-script backlinks_auth.py --setup",
             "metadata": {"source": "moz"},
         }
         if args.json:

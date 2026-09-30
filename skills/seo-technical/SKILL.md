@@ -149,7 +149,7 @@ layout stability across templates, `cursor: pointer` correctness — live in
 
 ```bash
 # Render with Playwright + capture accessibility tree, then score
-python3 scripts/agent_ux_check.py https://example.com --json
+~/.claude/skills/seo/run-script agent_ux_check.py https://example.com --json
 ```
 
 The scanner outputs an Agent-UX score (0-100) plus itemized issues:
@@ -160,7 +160,7 @@ The scanner outputs an Agent-UX score (0-100) plus itemized issues:
 
 The accessibility-tree snapshot uses Playwright's
 `page.accessibility.snapshot(interesting_only=False)`. To capture the tree
-without scoring, use `python3 scripts/render_page.py <url> --a11y-tree --json`.
+without scoring, use `~/.claude/skills/seo/run-script render_page.py <url> --a11y-tree --json`.
 
 Surface findings as **opportunities**, not failures. The standards (WebMCP,
 agent UX heuristics) are early — don't gate audits on a sub-100 score.
@@ -187,13 +187,9 @@ agent UX heuristics) are early — don't gate audits on a sub-100 score.
 ### Medium Priority (fix within 1 month)
 ### Low Priority (backlog)
 
-## DataForSEO Integration (Optional)
-
-If DataForSEO MCP tools are available, use `on_page_instant_pages` for real page analysis (status codes, page timing, broken links, on-page checks), `on_page_lighthouse` for Lighthouse audits (performance, accessibility, SEO scores), and `domain_analytics_technologies_domain_technologies` for technology stack detection.
-
 ## Google API Integration (Optional)
 
-If Google API credentials are configured, use `python3 scripts/pagespeed_check.py <url> --json` for real PSI + CrUX field data (replaces lab-only CWV estimates), `python3 scripts/crux_history.py <url> --json` for 25-week CWV trends, and `python3 scripts/gsc_inspect.py <url> --json` for real indexation status per URL.
+If Google API credentials are configured, use `~/.claude/skills/seo/run-script pagespeed_check.py <url> --json` for real PSI + CrUX field data (replaces lab-only CWV estimates), `~/.claude/skills/seo/run-script crux_history.py <url> --json` for 25-week CWV trends, and `~/.claude/skills/seo/run-script gsc_inspect.py <url> --json` for real indexation status per URL.
 
 ## Error Handling
 

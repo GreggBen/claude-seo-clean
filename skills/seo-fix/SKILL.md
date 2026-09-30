@@ -23,8 +23,8 @@ metadata:
 **Invocation:** `/seo-fix $1` where `$1` is any mix of a URL, a local path, and a git
 remote. Modes are inferred; nothing needs to be declared.
 
-**Scripts:** at the plugin root `scripts/` — `fix_observe.py`, `fix_correlate.py`,
-`fix_verify.py`.
+**Scripts:** use `~/.claude/skills/seo/run-script` for `fix_observe.py`,
+`fix_correlate.py` and `fix_verify.py` from any working directory.
 
 ---
 
@@ -91,7 +91,7 @@ markup live. `fix_observe.py` reports this as `views.source.framework`. See
 ## Step 2 — OBSERVE
 
 ```bash
-python3 scripts/fix_observe.py \
+~/.claude/skills/seo/run-script fix_observe.py \
   --url https://example.com \
   --codebase ~/dev/site \
   --out .seo-fix/snapshot.json --summary
@@ -107,7 +107,8 @@ and you must carry that caveat into whatever you tell the user.
 
 If the rendered view is missing and the site is a SPA, say so plainly: the most important
 correlation is unavailable and the run is partial. Offer:
-`pip install playwright && playwright install chromium`.
+`~/.claude/skills/seo/.venv/bin/python -m playwright install chromium` after
+the installer has prepared the venv.
 
 ### Multi-page runs
 
@@ -122,7 +123,7 @@ areas. Cap the sweep and **say what you capped**: a silent limit reads as full c
 ## Step 3 — CORRELATE
 
 ```bash
-python3 scripts/fix_correlate.py .seo-fix/snapshot.json \
+~/.claude/skills/seo/run-script fix_correlate.py .seo-fix/snapshot.json \
   --out .seo-fix/findings.json --format markdown
 ```
 
@@ -189,7 +190,7 @@ Fix recipes per framework and per finding: `references/fix-catalog.md`.
 ## Step 6 — VERIFY
 
 ```bash
-python3 scripts/fix_verify.py \
+~/.claude/skills/seo/run-script fix_verify.py \
   --before .seo-fix/findings.json \
   --url https://example.com --codebase ~/dev/site \
   --out .seo-fix/verification.json
@@ -210,6 +211,11 @@ Two properties to respect:
 For a codebase-only run, verify after rebuilding or restarting the dev server, otherwise
 you are re-reading the same stale output.
 
+For generated route inventories (sitemaps, category and location indexes), verify the
+same eligibility predicate in the generator and in the destination route. Check the
+served response, robots policy and canonical for representative eligible and excluded
+records. If a timestamp is unknown, omit `lastmod` rather than manufacturing freshness.
+
 ---
 
 ## Reporting to the user
@@ -226,7 +232,8 @@ is honest; "your site is clean" is not, when the rendered view failed to load.
 ### On scoring
 
 This skill deliberately emits **no overall score**. The other skills in this toolkit
-produce a 0–100 SEO Health Score, which is useful for tracking movement over time. A
+produce a 0–100 SEO Health Score, which is a heuristic for comparing the same checks
+over time, not an observed search metric. A
 number here would invite the reading that the site is *N%* machine-readable, which is a
 claim about all machine readers — something no local instrument can support. Report
 findings, severities and closures. If the user wants a score, run `/seo audit` and say

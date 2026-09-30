@@ -1,9 +1,10 @@
 <!-- Updated: 2026-03-23 -->
-# GBP Profile Completeness Checklist (Via API)
+# GBP Profile Completeness Checklist
 
-This checklist scores a Google Business Profile using data retrieved from
-the DataForSEO My Business Info API. It measures profile completeness on
-the maps PLATFORM, not on-page signals (seo-local handles on-page).
+Use this checklist against visible public profile fields or business-supplied
+evidence. It measures the maps platform; seo-local handles website content.
+Mark unavailable fields unknown, not missing. For a service-area business,
+an intentionally hidden street address is not a deficiency.
 
 ## Sources
 
@@ -15,9 +16,12 @@ the maps PLATFORM, not on-page signals (seo-local handles on-page).
 
 ## Scoring System
 
-Each field: **Present + Optimized = 2pts**, **Present = 1pt**, **Missing = 0pts**
+Each observed applicable field: **Present + Optimized = 2pts**,
+**Present = 1pt**, **Missing = 0pts**. Do not score unknown fields.
 
-Total possible: 50 points. Normalize to 0-100 scale: `(score / 50) * 100`
+The full checklist has 50 possible points. Only report a completeness score
+when every applicable field is observable; otherwise report observed fields
+and unknowns without a number.
 
 ---
 
@@ -129,22 +133,3 @@ This ensures consistent scoring regardless of which industry multipliers are act
 | 0-24 | Critical | Profile barely exists or unclaimed. Start with verification + Critical fields |
 
 ---
-
-## Data Mapping (DataForSEO → Checklist)
-
-| Checklist Field | DataForSEO My Business Info Field |
-|----------------|----------------------------------|
-| Primary category | `category` |
-| Additional categories | `additional_categories` |
-| Business name | `title` |
-| Address | `address_info` |
-| Phone | `contact_info` (type: phone) |
-| Website | `domain`, `url` |
-| Hours | `work_hours` |
-| Description | `description` |
-| Services | (separate API or attributes) |
-| Photos | `photos_count`, `main_image` |
-| Attributes | `attributes` (grouped by type) |
-| Popular times | `popular_times` |
-| Posts | My Business Updates API |
-| Verified status | Not directly exposed — infer from profile completeness + Maps SERP presence, or flag as "Unknown (manual check required)" |

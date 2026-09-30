@@ -48,10 +48,6 @@ Séparer `OAI-SearchBot` (recherche) de `GPTBot` (entraînement). Les règles so
 
 Only 11% of domains are cited by both ChatGPT and Google AI Overviews, so platform optimization matters.
 
-## DataForSEO Integration (Optional)
-
-If DataForSEO MCP tools are available, use `ai_optimization_chat_gpt_scraper` for live ChatGPT visibility and `ai_opt_llm_ment_search` for LLM mention tracking.
-
 ## Output Format
 
 Provide a structured report with:
@@ -64,7 +60,7 @@ Provide a structured report with:
 
 ## Fetching pages (v2.0.0)
 
-Use `python3 scripts/render_page.py <URL> --mode auto --json` for page HTML. `auto` does a raw fetch and only spins up Playwright when an SPA shell is detected; use `--mode always` to force a render or `--mode never` to skip Playwright entirely. The JSON exposes `raw_content` (pre-JS), `content` (post-JS), `is_spa`, `extracted_text` (boilerplate-stripped via trafilatura), and `publication_date` (htmldate). SSRF and DNS-rebinding protection live in `scripts/url_safety.py` — never call `requests.get` directly on user-supplied URLs.
+Use `~/.claude/skills/seo/run-script render_page.py <URL> --mode auto --json` for page HTML. `auto` does a raw fetch and only spins up Playwright when an SPA shell is detected; use `--mode always` to force a render or `--mode never` to skip Playwright entirely. The JSON exposes `raw_content` (pre-JS), `content` (post-JS), `is_spa`, `extracted_text` (boilerplate-stripped via trafilatura), and `publication_date` (htmldate). SSRF and DNS-rebinding protection live in `scripts/url_safety.py` — never call `requests.get` directly on user-supplied URLs.
 
 AI citation analysis benefits from the `extracted_text` field — passage-level scoring should run against trafilatura's boilerplate-stripped output, not the full HTML, so navigation chrome and footers don't dilute the signal.
 

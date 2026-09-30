@@ -268,10 +268,6 @@ Generate `GEO-ANALYSIS.md` with:
 4. Implement comprehensive entity linking (sameAs across platforms)
 5. Develop unique tools or calculators
 
-## DataForSEO Integration (Optional)
-
-If DataForSEO MCP tools are available, use `ai_optimization_chat_gpt_scraper` to check what ChatGPT web search returns for target queries (real GEO visibility check) and `ai_opt_llm_ment_search` with `ai_opt_llm_ment_top_domains` for LLM mention tracking across AI platforms.
-
 ## Error Handling
 
 | Scenario | Action |

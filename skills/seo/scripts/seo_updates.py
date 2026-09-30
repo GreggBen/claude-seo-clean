@@ -13,11 +13,11 @@ confirmed against ``status.search.google.com``.
 
 Usage::
 
-    python scripts/seo_updates.py                  # latest 10
-    python scripts/seo_updates.py --since 2025-06  # ISO yyyy or yyyy-mm filter
-    python scripts/seo_updates.py --kind core
-    python scripts/seo_updates.py --json
-    python scripts/seo_updates.py --unverified     # show 3rd-party claims awaiting check
+    ~/.claude/skills/seo/run-script seo_updates.py                  # latest 10
+    ~/.claude/skills/seo/run-script seo_updates.py --since 2025-06  # ISO yyyy or yyyy-mm filter
+    ~/.claude/skills/seo/run-script seo_updates.py --kind core
+    ~/.claude/skills/seo/run-script seo_updates.py --json
+    ~/.claude/skills/seo/run-script seo_updates.py --unverified     # show 3rd-party claims awaiting check
 """
 
 from __future__ import annotations

@@ -2,8 +2,8 @@
 name: seo-images
 description: >
   Image optimization analysis for SEO and performance. Checks alt text, file
-  sizes, formats, responsive images, lazy loading, CLS prevention, image SERP
-  rankings (via DataForSEO), and image file optimization (WebP/AVIF conversion,
+  sizes, formats, responsive images, lazy loading, CLS prevention, and image file
+  optimization (WebP/AVIF conversion,
   IPTC/XMP metadata injection). Use when user says "image optimization",
   "alt text", "image SEO", "image size", "image audit", "optimize images",
   "image metadata", "image SERP", "convert to webp", or "image file optimize".
@@ -195,35 +195,6 @@ Sorted by file size impact (largest savings first):
 
 ---
 
-## Image SERP Analysis
-
-When DataForSEO MCP is available, enhance the image audit with competitive data.
-
-### `/seo images serp <keyword>`
-
-Cross-reference on-page images with Google Images SERP rankings.
-
-**Workflow:**
-1. Fetch Google Images results via `serp_google_images_live_advanced` (depth=100)
-2. Extract: top domains, image types, alt text patterns
-3. Output competitor image SERP landscape
-
-**Output:**
-
-| Rank | Domain | Title/Alt | Image URL | Page URL |
-|------|--------|-----------|-----------|----------|
-| 1 | example.com | "Blue running shoes..." | .../shoes.webp | /products/... |
-
-**Analysis includes:**
-- **Domain dominance**: which sites own the most image positions (top 10 by count)
-- **Alt text patterns**: common title/alt patterns in top-ranking images
-- **Format distribution**: WebP vs JPEG vs PNG in top results
-- **Opportunity score**: keywords where you have page rankings but no image presence
-
-If DataForSEO MCP is not available, inform user and suggest installing the extension.
-
----
-
 ## Image File Optimization
 
 Optimize image files for SEO: format conversion, metadata injection, compression.
@@ -321,13 +292,13 @@ https://developers.google.com/search/docs/fundamentals/ai-optimization-guide
 
 ```bash
 # Audit a directory for the IPTC label (counts: missing, ai, captured, etc.)
-python3 scripts/iptc_ai_label.py audit ./images/ --json
+~/.claude/skills/seo/run-script iptc_ai_label.py audit ./images/ --json
 
 # Audit a single image
-python3 scripts/iptc_ai_label.py audit ./hero.webp --json
+~/.claude/skills/seo/run-script iptc_ai_label.py audit ./hero.webp --json
 
 # Inject the AI label into an image
-python3 scripts/iptc_ai_label.py inject ./ai-hero.webp \
+~/.claude/skills/seo/run-script iptc_ai_label.py inject ./ai-hero.webp \
     --source-type trainedAlgorithmicMedia
 
 # Other vocabulary values:
@@ -406,4 +377,3 @@ For maximum image SEO, run this pipeline on each image:
 | Images behind CDN or authentication | Note that image files could not be directly accessed for size analysis. Report available metadata (alt text, dimensions, format from markup) and flag inaccessible resources. |
 | exiftool not installed | Fall back to ImageMagick for metadata. Recommend: `sudo apt install libimage-exiftool-perl` |
 | cwebp not installed | Fall back to ImageMagick or FFmpeg for WebP conversion. Recommend: `sudo apt install webp` |
-| DataForSEO MCP not available | Skip Image SERP Analysis section. Note extension is not installed. |

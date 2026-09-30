@@ -18,7 +18,7 @@ ignored, not rejected):
   - ``compatibility`` (free text, e.g. "Requires the @ahrefs/mcp MCP server")
   - ``metadata``     (a dict; metadata.version is read by the consistency tests)
 
-The check walks every ``SKILL.md`` under ``skills/`` and ``extensions/``
+The check walks every ``SKILL.md`` under ``skills/``
 and reports portability findings. Severity:
 
   - ``error``: a harness will outright reject the file (missing required
@@ -33,9 +33,9 @@ build but are surfaced in the report.
 
 Usage::
 
-    python scripts/portability_check.py
-    python scripts/portability_check.py --json
-    python scripts/portability_check.py --strict   # warnings also fail
+    ~/.claude/skills/seo/run-script portability_check.py
+    ~/.claude/skills/seo/run-script portability_check.py --json
+    ~/.claude/skills/seo/run-script portability_check.py --strict   # warnings also fail
 """
 
 from __future__ import annotations
@@ -47,7 +47,7 @@ import sys
 from pathlib import Path
 
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
+REPO_ROOT = Path(__file__).resolve().parents[3]
 
 
 _NAME_RE = re.compile(r"^[a-z][a-z0-9-]{1,62}[a-z0-9]$")
@@ -55,14 +55,8 @@ _FRONTMATTER_RE = re.compile(r"^---\n(.*?)\n---", re.DOTALL)
 
 
 def _find_skill_files() -> list[Path]:
-    """Every SKILL.md under skills/ and extensions/."""
-    paths: list[Path] = []
-    for root in ("skills", "extensions"):
-        base = REPO_ROOT / root
-        if not base.is_dir():
-            continue
-        paths.extend(base.rglob("SKILL.md"))
-    return sorted(paths)
+    """Every SKILL.md under skills/."""
+    return sorted((REPO_ROOT / "skills").rglob("SKILL.md"))
 
 
 def _parse_frontmatter(text: str) -> dict[str, str] | None:

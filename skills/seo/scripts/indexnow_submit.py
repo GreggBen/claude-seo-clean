@@ -20,14 +20,14 @@ Usage
 =====
 ::
 
-    python scripts/indexnow_submit.py \\
+    ~/.claude/skills/seo/run-script indexnow_submit.py \\
         --host example.com \\
         --key abcd1234… \\
         --key-location https://example.com/abcd1234.txt \\
         --urls https://example.com/new-post https://example.com/updated-page
 
     # Or read URLs from a file (one per line):
-    python scripts/indexnow_submit.py \\
+    ~/.claude/skills/seo/run-script indexnow_submit.py \\
         --host example.com --key abcd1234… --key-location https://… \\
         --urls-file changed.txt
 

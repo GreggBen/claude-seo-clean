@@ -1,16 +1,12 @@
 ---
 name: seo-ecommerce
 description: >
-  E-commerce SEO analysis: Google Shopping visibility, Amazon marketplace
-  intelligence, product schema validation, competitor pricing analysis, and
-  marketplace keyword gaps. Combines on-page product SEO with marketplace data
-  from DataForSEO Merchant API. Use when user says "ecommerce SEO", "product SEO",
-  "Google Shopping", "marketplace SEO", "product schema", "Amazon SEO",
-  "product listings", "shopping ads", or "merchant SEO".
+  E-commerce SEO analysis of product pages, Product schema, offers, images,
+  content, and internal links. Use when the user asks for product SEO,
+  merchant listing markup, or an e-commerce page audit.
 user-invocable: true
-argument-hint: "<url or keyword>"
+argument-hint: "<url>"
 license: MIT
-compatibility: "Enhanced with DataForSEO Merchant API (optional)"
 metadata:
   author: AgriciDaniel
   original_author: "Matej Marjanovic (Pro Hub Challenge)"
@@ -20,30 +16,27 @@ metadata:
 
 # E-commerce SEO Analysis
 
-Comprehensive product page optimization, marketplace intelligence, and
-competitive pricing analysis. Works standalone (on-page + schema) and with
-DataForSEO Merchant API for live Google Shopping and Amazon data.
+Product page optimization from the page and its structured data. Do not report
+live marketplace position or competitor pricing without a verified data source.
 
 ## Commands
 
-| Command | Purpose | DataForSEO? |
-|---------|---------|-------------|
-| `/seo ecommerce <url>` | Full e-commerce SEO analysis of a product page or store | Optional |
-| `/seo ecommerce products <keyword>` | Google Shopping competitive analysis | Required |
-| `/seo ecommerce gaps <domain>` | Keyword gap: organic vs Shopping visibility | Required |
-| `/seo ecommerce schema <url>` | Product schema validation and enhancement | No |
+| Command | Purpose |
+|---------|---------|
+| `/seo ecommerce <url>` | On-page and Product schema analysis |
+| `/seo ecommerce schema <url>` | Product schema validation and enhancement |
 
 ---
 
-## 1. Product Page Analysis (No DataForSEO Needed)
+## 1. Product Page Analysis
 
 Fetch and parse any product page for on-page SEO quality.
 
 ### Workflow
 
 ```
-1. python3 scripts/render_page.py <url> --mode auto → raw/rendered HTML
-2. python3 scripts/parse_html.py --url <url>   → SEO elements
+1. ~/.claude/skills/seo/run-script render_page.py <url> --mode auto → raw/rendered HTML
+2. ~/.claude/skills/seo/run-script parse_html.py --url <url>   → SEO elements
 3. Analyze product-specific signals (below)
 ```
 
@@ -99,135 +92,7 @@ Fetch and parse any product page for on-page SEO quality.
 
 ---
 
-## 2. Google Shopping Intelligence (DataForSEO Merchant API)
-
-Live competitive analysis from Google Shopping results.
-
-### Cost Guardrail (MANDATORY)
-
-Before EVERY Merchant API call:
-```bash
-python3 scripts/dataforseo_costs.py check merchant_google_products_search
-```
-
-- `"status": "approved"` -- proceed
-- `"status": "needs_approval"` -- show cost, ask user
-- `"status": "blocked"` -- stop, inform user
-
-After each call:
-```bash
-python3 scripts/dataforseo_costs.py log merchant_google_products_search <cost>
-```
-
-### Workflow
-
-```bash
-# Product search: who sells what at what price
-python3 scripts/dataforseo_merchant.py search "<keyword>" --marketplace google
-
-# Seller analysis: merchant ratings and dominance
-python3 scripts/dataforseo_merchant.py sellers "<keyword>"
-
-# Normalize results for analysis
-python3 scripts/dataforseo_normalize.py results.json --module merchant
-```
-
-### Analysis Outputs
-
-#### Pricing Intelligence
-- Price distribution: min, max, median, P25, P75
-- Price outliers (> 2 standard deviations from median)
-- Price-to-rating correlation
-- Currency normalization to USD (or user-specified)
-
-#### Seller Landscape
-- Top 10 sellers by listing count
-- Merchant rating distribution
-- Free shipping prevalence
-- New vs established sellers
-
-#### Product Listing Quality
-- Title keyword patterns in top listings
-- Average rating and review count benchmarks
-- Image count per listing
-- Availability status distribution
-
-Load `references/marketplace-endpoints.md` for full API parameter details.
-
----
-
-## 3. Amazon Marketplace (DataForSEO)
-
-Cross-marketplace intelligence comparing Google Shopping and Amazon.
-
-### Cost Guardrail (MANDATORY)
-
-```bash
-python3 scripts/dataforseo_costs.py check merchant_amazon_products_search
-```
-
-Amazon endpoints are in the `warn_endpoints` set -- always requires user approval.
-
-### Workflow
-
-```bash
-# Amazon product search
-python3 scripts/dataforseo_merchant.py search "<keyword>" --marketplace amazon
-
-# Cross-marketplace comparison
-python3 scripts/dataforseo_merchant.py compare "<keyword>"
-```
-
-### Cross-Marketplace Report
-
-| Metric | Google Shopping | Amazon |
-|--------|---------------|--------|
-| Avg price | $ | $ |
-| Median rating | X.X | X.X |
-| Avg review count | N | N |
-| Top seller share | % | % |
-| Free shipping % | % | % |
-
----
-
-## 4. Marketplace Keyword Gaps
-
-Identify mismatches between organic and Shopping visibility.
-
-### Workflow
-
-1. Fetch organic rankings via seo-dataforseo:
-   `dataforseo_labs_google_ranked_keywords` for domain
-2. Fetch Google Shopping presence via Merchant API:
-   `merchant_google_products_search` for top organic keywords
-3. Cross-reference results
-
-### Gap Types
-
-| Gap Type | Meaning | Action |
-|----------|---------|--------|
-| **Organic Only** | Ranks organically but no Shopping ads | Create Google Merchant Center feed, bid on these keywords |
-| **Shopping Only** | Shopping visibility but weak/no organic | Create content (buying guides, comparison pages) for these keywords |
-| **Both Present** | Visible in both channels | Optimize: ensure price consistency, enhance schema |
-| **Neither** | No visibility in either | Low priority unless high volume |
-
-### Output Format
-
-```
-## Keyword Gap Analysis: example.com
-
-### Opportunities: Organic → Shopping (12 keywords)
-| Keyword | Organic Pos | Volume | CPC | Recommended Action |
-|---------|------------|--------|-----|-------------------|
-
-### Opportunities: Shopping → Organic (8 keywords)
-| Keyword | Shopping Rank | Volume | CPC | Content Type Needed |
-|---------|-------------|--------|-----|-------------------|
-```
-
----
-
-## 5. Product Schema Enhancement
+## 2. Product Schema Enhancement
 
 Validate and generate Product schema following Google's current requirements.
 
@@ -292,9 +157,8 @@ Validate and generate Product schema following Google's current requirements.
 | **seo-schema** | Delegates Product schema generation; reuses validation logic |
 | **seo-images** | Product image audit (alt text, format, dimensions) — plus `DigitalSourceType: TrainedAlgorithmicMedia` IPTC label for AI-generated product images (Merchant Center requirement) |
 | **seo-content** | Product description E-E-A-T and uniqueness analysis |
-| **seo-dataforseo** | Organic keyword rankings for gap analysis |
 | **seo-technical** | Core Web Vitals for product pages (LCP on hero image) |
-| **seo-google** | Google Merchant Center feed validation via GSC |
+| **seo-google** | Search Console indexation and PageSpeed data for the product URL |
 
 ## UCP — Universal Commerce Protocol (forward-looking)
 
@@ -313,10 +177,10 @@ capability examples, and the relationship to AP2 (Agent Payments Protocol).
 
 ```bash
 # Discover and validate the UCP profile
-python3 scripts/ucp_check.py https://store.example.com --json
+~/.claude/skills/seo/run-script ucp_check.py https://store.example.com --json
 
 # With endpoint reachability probes (HEAD each declared capability)
-python3 scripts/ucp_check.py https://store.example.com --probe-endpoints --json
+~/.claude/skills/seo/run-script ucp_check.py https://store.example.com --probe-endpoints --json
 ```
 
 The script returns: profile presence, version, declared capabilities,
@@ -332,10 +196,6 @@ reported explicitly. Missing profile is reported as opportunity, not failure
 | Error | Cause | Response |
 |-------|-------|----------|
 | No Product schema found | Page lacks JSON-LD | Analyze page content, generate recommended schema |
-| DataForSEO credentials missing | Env vars not set | Run analysis without marketplace data, note limitation |
-| Cost check blocked | Daily budget exceeded | Inform user, offer free-only analysis |
-| Empty Shopping results | No products for keyword | Suggest broader keyword, check location settings |
-| Amazon API timeout | Network/rate limit | Retry with backoff, fall back to Google-only |
 | Invalid URL | Malformed input | Validate via `google_auth.validate_url()`, show error |
 | Non-product page | URL is category/homepage | Detect page type, suggest `/seo ecommerce schema` instead |
 
@@ -354,12 +214,6 @@ reported explicitly. Missing profile is reported as opportunity, not failure
 - Image Optimization: XX/100
 - Content Quality: XX/100
 - Internal Linking: XX/100
-
-### Marketplace Intelligence (if DataForSEO available)
-- Google Shopping Listings: N products found
-- Price Range: $XX - $XX (median: $XX)
-- Top Seller: [name] (XX% market share)
-- Amazon Comparison: [available/not checked]
 
 ### Top Recommendations
 1. [Critical] ...

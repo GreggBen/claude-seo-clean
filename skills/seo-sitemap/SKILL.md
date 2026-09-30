@@ -21,7 +21,8 @@ metadata:
 - Valid XML format
 - URL count <50,000 per file (protocol limit)
 - All URLs return HTTP 200
-- `<lastmod>` dates are accurate (not all identical)
+- `<lastmod>` dates come from a known content change for the corresponding URL;
+  omit the tag when no reliable date exists. Never use audit or build time as a substitute
 - No deprecated tags: `<priority>` and `<changefreq>` are ignored by Google
 - Sitemap referenced in robots.txt
 - Compare crawled pages vs sitemap; flag missing pages
@@ -33,6 +34,11 @@ metadata:
 - No noindexed URLs in sitemap
 - No redirected URLs in sitemap
 - HTTPS URLs only (no HTTP)
+- Compare each dynamic URL with the route's actual publication and visibility gates
+  (verification, status, moderation, minimum result count, `notFound` and robots policy).
+  A valid XML entry for a page that is empty, hidden or `noindex` is still a defect
+- For paginated or partitioned sitemaps, check that deduplication and filters use the
+  same data contract as the destination pages; test boundary and empty partitions
 
 ### Common Issues
 | Issue | Severity | Fix |
@@ -41,7 +47,7 @@ metadata:
 | Non-200 URLs | High | Remove or fix broken URLs |
 | Noindexed URLs included | High | Remove from sitemap |
 | Redirected URLs included | Medium | Update to final URLs |
-| All identical lastmod | Low | Use actual modification dates |
+| Invented or build-time lastmod | Medium | Use a real per-URL modification date, or omit it |
 | Priority/changefreq used | Info | Can remove (ignored by Google) |
 
 ## Mode 2: Generate New Sitemap
@@ -56,6 +62,10 @@ metadata:
 5. Generate valid XML output
 6. Split at 50k URLs with sitemap index
 7. Generate STRUCTURE.md documentation
+
+Publication in a sitemap proves only that a URL was declared. Report HTTP response,
+canonical, indexability and actual search indexation as separate observations; do not
+infer crawling or indexing from the XML alone.
 
 ### Safe Programmatic Pages (OK at scale)
 ✅ Integration pages (with real setup docs)

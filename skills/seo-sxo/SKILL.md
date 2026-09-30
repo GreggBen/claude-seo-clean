@@ -43,8 +43,8 @@ well-optimized it is.
 
 ### Step 1: Target Acquisition
 
-1. Fetch the target URL via `scripts/render_page.py --mode auto` (SPA-aware and SSRF-safe)
-2. Parse with `scripts/parse_html.py` to extract: title, H1, meta description,
+1. Fetch the target URL via `~/.claude/skills/seo/run-script render_page.py <url> --mode auto --output <html-file>` (SPA-aware and SSRF-safe)
+2. Parse with `~/.claude/skills/seo/run-script parse_html.py <html-file> --json` to extract: title, H1, meta description,
    headings hierarchy, word count, schema markup, CTAs, media elements
 3. If no keyword provided, extract primary keyword from title tag + H1 overlap
 4. Validate keyword is non-empty before proceeding
@@ -165,15 +165,6 @@ Read `references/wireframe-templates.md` for templates.
    - YES: "Add pricing CTA with annual savings badge below hero, linking to /pricing#enterprise"
 4. Output as semantic HTML section outline with annotations
 
-## DataForSEO Integration
-
-If DataForSEO MCP tools are available:
-
-1. **Before any API call**, run cost estimate and confirm with user
-2. Use `google_organic_serp` for precise SERP data (positions, features, snippets)
-3. Use `keyword_data` for search volume and competition metrics
-4. Fall back to WebSearch if DataForSEO unavailable -- note reduced precision in output
-
 ## SXO Score vs SEO Health Score
 
 The SXO score is **separate** from the main SEO Health Score.
@@ -239,12 +230,11 @@ The SXO score is **separate** from the main SEO Health Score.
 | WebSearch returns <5 results | Proceed with available data, note limited sample |
 | SERP has no organic results (all ads) | Note highly commercial SERP, analyze ad copy only |
 | Target page is JavaScript-rendered | Note limitation, use available HTML content |
-| DataForSEO cost exceeds threshold | Fall back to WebSearch, notify user |
 
 ## Quality Checklist
 
 Before delivering results, verify:
-- [ ] Target URL was fetched via `scripts/render_page.py --mode auto` (not raw curl/fetch)
+- [ ] Target URL was fetched via `~/.claude/skills/seo/run-script render_page.py <url> --mode auto` (not raw curl/fetch)
 - [ ] Page type classification uses taxonomy from references
 - [ ] At least 5 SERP results were analyzed
 - [ ] User stories cite specific SERP signals as evidence
