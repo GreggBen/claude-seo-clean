@@ -20,20 +20,20 @@ Per the v2 gap analysis (May 2026):
 
 Usage::
 
-    python scripts/schema_generate.py reservation \\
+    ~/.claude/skills/seo/run-script schema_generate.py reservation \\
         --provider "Marea NYC" --start 2026-06-04T19:30:00-04:00 \\
         --party-size 4 --reservation-id RX-12345
 
-    python scripts/schema_generate.py order \\
+    ~/.claude/skills/seo/run-script schema_generate.py order \\
         --merchant "Acme Pizza" --order-url https://acme.example/order
 
-    python scripts/schema_generate.py discussion \\
+    ~/.claude/skills/seo/run-script schema_generate.py discussion \\
         --headline "How do you score INP correctly?" \\
         --author "Sara Park" \\
         --url https://forum.example.com/t/123 \\
         --date 2026-05-12T14:00:00Z
 
-    python scripts/schema_generate.py profile \\
+    ~/.claude/skills/seo/run-script schema_generate.py profile \\
         --name "Daniel Agrici" \\
         --url https://agricidaniel.com/about \\
         --same-as https://github.com/AgriciDaniel \\

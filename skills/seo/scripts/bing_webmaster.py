@@ -229,7 +229,7 @@ def get_link_counts(site_url: str, api_key: str) -> dict:
             "site_url": site_url,
             "total_links_sample": link_count,
             "traffic_info": raw,
-            "note": "Link counts are sampled from Bing's index. For comprehensive data, use Moz API or DataForSEO.",
+            "note": "Link counts are sampled from Bing's index; Moz API can provide another partial backlink view.",
         }
 
     return result
@@ -377,7 +377,7 @@ def main():
         result = {
             "status": "error",
             "data": None,
-            "error": "No Bing Webmaster API key configured. Run: python scripts/backlinks_auth.py --setup",
+            "error": "No Bing Webmaster API key configured. Run: ~/.claude/skills/seo/run-script backlinks_auth.py --setup",
             "metadata": {"source": "bing_webmaster"},
         }
         if args.json:

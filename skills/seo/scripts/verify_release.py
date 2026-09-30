@@ -7,7 +7,7 @@ Usage
 
 After installing from a tag::
 
-    python scripts/verify_release.py path/to/release-manifest.json
+    ~/.claude/skills/seo/run-script verify_release.py path/to/release-manifest.json
 
 The script returns exit code 0 when every file in the manifest is
 present and matches the recorded SHA-256, and exit code 1 (with a

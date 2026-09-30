@@ -28,9 +28,9 @@ delegated to the ``seo-content`` skill which orchestrates it.
 
 CLI::
 
-    python scripts/domain_history.py example.com
-    python scripts/domain_history.py example.com --json
-    python scripts/domain_history.py example.com --topic crypto-signals --baseline-topic veterinary
+    ~/.claude/skills/seo/run-script domain_history.py example.com
+    ~/.claude/skills/seo/run-script domain_history.py example.com --json
+    ~/.claude/skills/seo/run-script domain_history.py example.com --topic crypto-signals --baseline-topic veterinary
 
 Output (JSON)::
 

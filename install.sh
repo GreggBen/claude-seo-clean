@@ -17,21 +17,25 @@ mkdir -p "${SKILLS_DST}" "${AGENTS_DST}"
 
 echo "→ Skills..."
 cp -R "${SRC_DIR}/skills/"seo* "${SKILLS_DST}/"
+chmod 755 "${SKILLS_DST}/seo/run-script"
 
 echo "→ Agents..."
 cp "${SRC_DIR}/agents/"seo-*.md "${AGENTS_DST}/"
 
 echo "→ Venv Python (skills à scripts : seo-audit, seo-technical, seo-drift, seo-google)..."
 VENV="${SKILLS_DST}/seo/.venv"
-if python3 -m venv "${VENV}" 2>/dev/null; then
-  "${VENV}/bin/pip" install --quiet -r "${SRC_DIR}/requirements.txt" \
-    && echo "  ✓ dépendances installées (${VENV})" \
-    || echo "  ⚠ pip a échoué — relance : ${VENV}/bin/pip install -r ${SRC_DIR}/requirements.txt"
-else
-  echo "  ⚠ venv indisponible — installe manuellement : pip install --user -r ${SRC_DIR}/requirements.txt"
+if ! python3 -m venv "${VENV}"; then
+  echo "✗ venv indisponible. Installe python3-venv puis relance l'installation." >&2
+  exit 1
 fi
+if ! "${VENV}/bin/pip" install --quiet -r "${SRC_DIR}/requirements.txt"; then
+  echo "✗ Installation des dépendances incomplète. Relance : ${VENV}/bin/pip install -r ${SRC_DIR}/requirements.txt" >&2
+  exit 1
+fi
+echo "  ✓ dépendances installées (${VENV})"
 
 echo ""
-echo "✓ Installé. 23 skills + 16 agents dans ~/.claude/ (aucun hook câblé, aucune extension payante)."
+echo "✓ Installé. 24 skills + 16 agents dans ~/.claude/ (aucun hook câblé, aucune extension payante)."
 echo "  Redémarre Claude Code, puis :  /seo audit https://ton-site.com"
+echo "  Scripts depuis tout répertoire :  ${SKILLS_DST}/seo/run-script portability_check.py --json"
 echo "  Désinstaller :  rm -rf ~/.claude/skills/seo* ~/.claude/agents/seo-*.md"

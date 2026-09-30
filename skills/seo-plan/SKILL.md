@@ -11,7 +11,7 @@ argument-hint: "[business-type]"
 license: MIT
 metadata:
   author: AgriciDaniel
-  version: "2.2.0"
+  version: "2.2.1"
   category: seo
 ---
 
@@ -112,10 +112,6 @@ Load from `assets/` directory:
 - Resource requirements defined
 - Dependencies identified
 - Risk mitigation strategies
-
-## DataForSEO Integration (Optional)
-
-If DataForSEO MCP tools are available, use `dataforseo_labs_google_competitors_domain` and `dataforseo_labs_google_domain_intersection` for real competitive intelligence, `dataforseo_labs_bulk_traffic_estimation` for traffic estimates, `kw_data_google_ads_search_volume` and `dataforseo_labs_bulk_keyword_difficulty` for keyword research, and `business_data_business_listings_search` for local business data.
 
 ## Error Handling
 

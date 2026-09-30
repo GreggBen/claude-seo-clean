@@ -16,8 +16,8 @@ actionable upgrade to claude-seo's CWV reporting.
 
 Usage::
 
-    python scripts/lcp_subparts.py https://example.com/
-    python scripts/lcp_subparts.py https://example.com/ --form-factor PHONE --json
+    ~/.claude/skills/seo/run-script lcp_subparts.py https://example.com/
+    ~/.claude/skills/seo/run-script lcp_subparts.py https://example.com/ --form-factor PHONE --json
 
 Requires the same Google API key used by ``scripts/crux_history.py``.
 """
@@ -97,7 +97,7 @@ def analyse(url: str, form_factor: str = "PHONE") -> dict:
     if not api_key:
         return {
             "error": "Google API key not configured. "
-                     "Run `python scripts/google_auth.py --setup`.",
+                     "Run `~/.claude/skills/seo/run-script google_auth.py --setup`.",
         }
 
     raw = _query_crux(url, form_factor, api_key)

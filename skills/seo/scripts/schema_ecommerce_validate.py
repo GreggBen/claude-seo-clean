@@ -20,9 +20,9 @@ Course Info, Special Announcement).
 
 Usage::
 
-    cat product.json | python scripts/schema_ecommerce_validate.py
-    python scripts/schema_ecommerce_validate.py product.json --eu
-    python scripts/schema_ecommerce_validate.py product.json --json
+    cat product.json | ~/.claude/skills/seo/run-script schema_ecommerce_validate.py
+    ~/.claude/skills/seo/run-script schema_ecommerce_validate.py product.json --eu
+    ~/.claude/skills/seo/run-script schema_ecommerce_validate.py product.json --json
 
 Exit code 0 on PASS, 1 on at least one Critical or High finding.
 """

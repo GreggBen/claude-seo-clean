@@ -120,7 +120,7 @@ def main():
 
     if not result["baselines"]:
         print(f"\nNo baselines found for {result['url']}.", file=sys.stderr)
-        print("Run `python scripts/drift_baseline.py <url>` to capture the first baseline.", file=sys.stderr)
+        print("Run `~/.claude/skills/seo/run-script drift_baseline.py <url>` to capture the first baseline.", file=sys.stderr)
 
 
 if __name__ == "__main__":

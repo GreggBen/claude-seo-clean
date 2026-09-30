@@ -10,7 +10,7 @@ argument-hint: "[url]"
 license: MIT
 metadata:
   author: AgriciDaniel
-  version: "2.2.0"
+  version: "2.2.1"
   category: seo
 ---
 
@@ -35,7 +35,8 @@ As of 2025-2026, AI companies actively crawl the web to train models and power A
 | Crawler | Company | robots.txt token | Purpose |
 |---------|---------|-----------------|---------|
 | GPTBot | OpenAI | `GPTBot` | Model training |
-| ChatGPT-User | OpenAI | `ChatGPT-User` | Real-time browsing |
+| OAI-SearchBot | OpenAI | `OAI-SearchBot` | Recherche ChatGPT |
+| ChatGPT-User | OpenAI | `ChatGPT-User` | Actions déclenchées par un utilisateur |
 | ClaudeBot | Anthropic | `ClaudeBot` | Model training |
 | PerplexityBot | Perplexity | `PerplexityBot` | Search index + training |
 | Bytespider | ByteDance | `Bytespider` | Model training |
@@ -44,7 +45,7 @@ As of 2025-2026, AI companies actively crawl the web to train models and power A
 
 **Key distinctions:**
 - Blocking `Google-Extended` prevents Gemini training use but does NOT affect Google Search indexing or AI Overviews (those use `Googlebot`)
-- Blocking `GPTBot` prevents OpenAI training but does NOT prevent ChatGPT from citing your content via browsing (`ChatGPT-User`)
+- Les règles `GPTBot` (entraînement) et `OAI-SearchBot` (recherche) sont indépendantes. `ChatGPT-User` ne contrôle pas l'inclusion dans la recherche ; ses actions initiées par l'utilisateur peuvent ne pas suivre robots.txt.
 - ~3-5% of websites now use AI-specific robots.txt rules
 
 **Example, selective AI crawler blocking:**
@@ -64,15 +65,17 @@ User-agent: *
 Allow: /
 ```
 
-**Recommendation:** Consider your AI visibility strategy before blocking. Being cited by AI systems drives brand awareness and referral traffic. Cross-reference the `seo-geo` skill for full AI visibility optimization.
+**Recommandation :** décider séparément l'accès pour la recherche et l'utilisation pour l'entraînement. Autoriser un robot ne garantit ni exploration ni citation. Source OpenAI vérifiée le 2026-09-28 : [rôles des robots et limites de robots.txt](https://developers.openai.com/api/docs/bots). Vérifier la documentation de chaque autre fournisseur avant de modifier ses règles.
 
 ### 2. Indexability
 - Canonical tags: self-referencing, no conflicts with noindex
 - Duplicate content: near-duplicates, parameter URLs, www vs non-www
 - Thin content: pages below minimum word counts per type
-- Pagination: rel=next/prev or load-more pattern
+- Pagination : URL et canonical propres à chaque page, liens séquentiels `<a href>` ; un bouton « charger plus » seul ne suffit pas à découvrir la suite. Google n'utilise plus `rel=next/prev` pour la pagination.
 - Hreflang: correct for multi-language/multi-region sites
 - Index bloat: unnecessary pages consuming crawl budget
+
+Source pagination vérifiée le 2026-09-28 : [Google Search Central](https://developers.google.com/search/docs/specialty/ecommerce/pagination-and-incremental-page-loading). Ces contrôles portent sur la découverte et les signaux servis, sans garantir l'indexation.
 
 ### 3. Security
 - HTTPS: enforced, valid SSL certificate, no mixed content
@@ -146,7 +149,7 @@ layout stability across templates, `cursor: pointer` correctness — live in
 
 ```bash
 # Render with Playwright + capture accessibility tree, then score
-python3 scripts/agent_ux_check.py https://example.com --json
+~/.claude/skills/seo/run-script agent_ux_check.py https://example.com --json
 ```
 
 The scanner outputs an Agent-UX score (0-100) plus itemized issues:
@@ -157,7 +160,7 @@ The scanner outputs an Agent-UX score (0-100) plus itemized issues:
 
 The accessibility-tree snapshot uses Playwright's
 `page.accessibility.snapshot(interesting_only=False)`. To capture the tree
-without scoring, use `python3 scripts/render_page.py <url> --a11y-tree --json`.
+without scoring, use `~/.claude/skills/seo/run-script render_page.py <url> --a11y-tree --json`.
 
 Surface findings as **opportunities**, not failures. The standards (WebMCP,
 agent UX heuristics) are early — don't gate audits on a sub-100 score.
@@ -184,13 +187,9 @@ agent UX heuristics) are early — don't gate audits on a sub-100 score.
 ### Medium Priority (fix within 1 month)
 ### Low Priority (backlog)
 
-## DataForSEO Integration (Optional)
-
-If DataForSEO MCP tools are available, use `on_page_instant_pages` for real page analysis (status codes, page timing, broken links, on-page checks), `on_page_lighthouse` for Lighthouse audits (performance, accessibility, SEO scores), and `domain_analytics_technologies_domain_technologies` for technology stack detection.
-
 ## Google API Integration (Optional)
 
-If Google API credentials are configured, use `python3 scripts/pagespeed_check.py <url> --json` for real PSI + CrUX field data (replaces lab-only CWV estimates), `python3 scripts/crux_history.py <url> --json` for 25-week CWV trends, and `python3 scripts/gsc_inspect.py <url> --json` for real indexation status per URL.
+If Google API credentials are configured, use `~/.claude/skills/seo/run-script pagespeed_check.py <url> --json` for real PSI + CrUX field data (replaces lab-only CWV estimates), `~/.claude/skills/seo/run-script crux_history.py <url> --json` for 25-week CWV trends, and `~/.claude/skills/seo/run-script gsc_inspect.py <url> --json` for real indexation status per URL.
 
 ## Error Handling
 

@@ -8,7 +8,7 @@ description: >
   or wants stage-specific SEO prompts.
 user-invocable: true
 argument-hint: "[stage] [url|topic]"
-license: MIT
+license: "MIT (integration); CC BY 4.0 (FLOW framework and prompts)"
 metadata:
   author: AgriciDaniel
   version: "2.2.0"
@@ -82,7 +82,7 @@ Load prompt files on demand — only for the stage the user requests.
 2. Display the full index: all 41 prompts with stage, name, trigger conditions
 
 ### On `/seo flow sync`
-1. Run: `python3 scripts/sync_flow.py`
+1. Run: `~/.claude/skills/seo/run-script sync_flow.py`
 2. Display the JSON summary (files added, updated, unchanged)
 3. Show attribution notice after sync completes
 

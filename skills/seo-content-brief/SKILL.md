@@ -228,14 +228,6 @@ When the user asks for "just an outline" or "content outline" instead of a full 
 [Full H2/H3 outline with word counts, format notes, FS targets, keyword guidance, and a 1-2 sentence writing note per section]
 ```
 
-## DataForSEO Integration (Optional)
-
-If DataForSEO MCP tools are available, use `serp_google_organic_live_advanced` for real SERP data and competitor analysis, `kw_data_google_ads_search_volume` for keyword volume, `dataforseo_labs_bulk_keyword_difficulty` for difficulty scores, `dataforseo_labs_search_intent` for intent classification, and `on_page_content_parsing_live` for competitor content extraction.
-
-## Ahrefs Integration (Optional)
-
-If Ahrefs MCP tools are available, use `keywords-explorer-overview` for keyword volume and difficulty, `serp-overview` for SERP analysis, `site-explorer-organic-keywords` for existing keyword rankings, and `site-explorer-top-pages` for competitor page performance.
-
 ## Error Handling
 
 | Scenario | Action |

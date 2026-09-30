@@ -1,8 +1,8 @@
-# claude-seo-clean — 23 skills SEO/AEO pour Claude Code, version assainie
+# claude-seo-clean — 24 skills SEO/AEO pour Claude Code, version assainie
 
 Une boîte à outils SEO/AEO pour [Claude Code](https://claude.com/claude-code) : audit de site,
 schema.org, AEO (citabilité par les IA — AI Overviews, ChatGPT, Perplexity), Core Web Vitals,
-contenu E-E-A-T, SEO local, et données de recherche via les **APIs gratuites de Google**.
+contenu E-E-A-T, SEO local, et données de recherche via les **APIs Google accessibles avec ton compte**.
 
 > **Version transparente et nettoyée** d'un excellent projet open-source.
 > Je l'ai audité, j'en ai retiré ce qui posait problème, et je documente pourquoi.
@@ -21,18 +21,19 @@ Ce projet est un **fork nettoyé** de [`AgriciDaniel/claude-seo`](https://github
 | **Les 8 extensions payantes** (DataForSEO, Ahrefs, Firecrawl…) | Elles branchent des APIs facturées à l'appel + posent des clés API en clair. Exclues → aucune dépense, aucune clé attendue. |
 | **Les 2 skills-passerelles** vers ces APIs (`seo-dataforseo`, `seo-image-gen`) | Inertes sans l'extension payante. |
 
-**Ce qui reste = tout ce qui tourne gratuitement**, sur les APIs gratuites de Google (Search Console,
-PageSpeed, CrUX, GA4) et des sources libres (Common Crawl, Moz free). L'audit sécurité n'a trouvé
+**Ce qui reste = les intégrations sans fournisseur payant imposé**, sur les APIs Google (Search Console,
+PageSpeed, CrUX, GA4) et des sources libres (Common Crawl, Moz free), selon les quotas et conditions
+propres à chaque service. L'audit sécurité n'a trouvé
 **aucune télémétrie, aucune exfiltration** : rien ne « rapporte » à personne.
 
 > ⚠️ **Note d'honnêteté** : « gratuit » ne débloque pas la donnée *premium* (SERP live, volumes de
 > mots-clés, index backlinks concurrents). Celle-ci est réellement payante chez des tiers — ce fork
 > ne la cracke pas, il **retire juste le tunnel** qui te poussait à la payer. La donnée qui compte
-> pour 90 % des cas (Search Console) est gratuite et connectée par **toi**.
+> via Search Console dépend des données de **ton** site et de ton accès.
 
 ---
 
-## Démarche (install + connecte TON Google, gratuitement)
+## Démarche (installation et connexion à ton compte Google)
 
 ```bash
 git clone https://github.com/GreggBen/claude-seo-clean.git
@@ -40,25 +41,43 @@ cd claude-seo-clean
 bash install.sh          # copie les skills/agents dans ~/.claude, prépare le venv Python
 ```
 
+Les commandes de scripts dans les skills et agents passent par
+`~/.claude/skills/seo/run-script <nom-du-script.py> [arguments...]` : ce lanceur
+retrouve les scripts et le Python du venv installé depuis n'importe quel
+répertoire courant. Vérification après installation :
+
+```bash
+~/.claude/skills/seo/run-script portability_check.py --json
+```
+
+Depuis le clone avant installation, utiliser `./skills/seo/run-script`.
+L'installation des dépendances reste dans `~/.claude/skills/seo/.venv` ; aucun
+paquet Python n'est installé globalement.
+
 Puis, dans Claude Code :
 
 ```
 /seo audit https://ton-site.com
 ```
 
-**Connexion Google (per-user, gratuite)** : les skills qui utilisent Search Console / PageSpeed /
+**Connexion Google (par utilisateur)** : les skills qui utilisent Search Console / PageSpeed /
 CrUX / GA4 (`seo-google`) s'authentifient avec **ton propre compte Google** via OAuth. Ton token
-reste **sur ta machine** (chiffré, `0600`). Aucune clé partagée, aucune donnée qui passe par un tiers.
-La 1ʳᵉ utilisation te guide pour créer un projet Google Cloud et activer les APIs (gratuit).
+reste **sur ta machine** dans un fichier JSON non chiffré ; le script applique les permissions
+`0600` lorsque le système de fichiers les prend en charge (`skills/seo/scripts/google_auth.py`,
+`_save_oauth_token`). Ces permissions limitent l'accès local, sans chiffrer le contenu.
+Aucune clé partagée ; les requêtes utilisent directement les API Google configurées.
+La 1ʳᵉ utilisation te guide pour créer un projet Google Cloud et activer les APIs concernées ;
+vérifie leurs quotas et conditions avant usage.
 
 Les skills **prompt-only** (`seo-schema`, `seo-geo`, `seo-content`) marchent **sans aucune config**.
 
 ---
 
-## Les 23 skills
+## Les 24 skills
 
 **Audit & technique**
 - `seo` — orchestrateur : route vers les spécialistes, détecte le type de site.
+- `seo-fix` — corrèle 3 vues d'une page (HTML brut, DOM rendu, code source) et corrige à la source ; la seule skill qui lit la codebase et y écrit, avec re-mesure obligatoire.
 - `seo-audit` — audit complet, délègue à jusqu'à 15 spécialistes, score de santé.
 - `seo-technical` — crawlabilité, indexabilité, sécurité, Core Web Vitals (INP), rendu JS.
 - `seo-page` — analyse on-page profonde d'une URL.
@@ -78,7 +97,7 @@ Les skills **prompt-only** (`seo-schema`, `seo-geo`, `seo-content`) marchent **s
 - `seo-plan` — stratégie SEO, roadmap, calendrier éditorial.
 - `seo-programmatic` — SEO programmatique à l'échelle, garde-fous anti thin content.
 
-**Données de recherche (APIs GRATUITES de Google)**
+**Données de recherche (APIs Google)**
 - `seo-google` — Search Console, PageSpeed, CrUX (25 semaines), GA4 organique.
 
 **Backlinks (sources gratuites)**
@@ -86,10 +105,10 @@ Les skills **prompt-only** (`seo-schema`, `seo-geo`, `seo-content`) marchent **s
 
 **Local & Maps**
 - `seo-local` — Google Business Profile, NAP, citations, avis, schema local.
-- `seo-maps` — geo-grid, intelligence avis, NAP cross-plateforme (tier gratuit Overpass/Geoapify).
+- `seo-maps` — présence cartographique publique, NAP cross-plateforme, commerces voisins (Overpass/Geoapify).
 
 **E-commerce & autres**
-- `seo-ecommerce` — schema produit, visibilité Shopping (partie on-page gratuite).
+- `seo-ecommerce` — audit des pages produit et du balisage Product/Offer.
 - `seo-images` — alt text, poids, formats, optimisation locale des images.
 - `seo-sxo` — Search Experience Optimization : analyse SERP inversée, intentions.
 - `seo-flow` — framework FLOW (Find / Leverage / Optimize / Win).
@@ -109,12 +128,12 @@ Ne laisse pas un agent Bash les déclencher tout seul.
 
 ---
 
-## Rendre le commerce local citable par les IA
+## Rendre les informations du commerce local consultables
 
-Ces skills t'aident à **auditer** ta citabilité par les IA. Pour un commerce local, le pas d'après
-c'est d'exposer des **données vérifiées et citables** aux moteurs IA :
-[**ActionsBricks**](https://actionsbricks.com) est la couche qui rend le commerce local
-réellement citable (fiches vérifiées, surfaces agent-readable). Un audit, puis une source fiable.
+Ces skills aident à auditer la découvrabilité et les signaux de citation observables.
+[**ActionsBricks**](https://actionsbricks.com) expose une représentation vérifiable
+et consultable des commerces locaux (fiches vérifiées, surfaces lisibles par les agents).
+La publication ne garantit ni la consultation, ni l'indexation, ni la citation par une IA.
 
 ---
 

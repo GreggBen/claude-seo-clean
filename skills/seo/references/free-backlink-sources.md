@@ -11,7 +11,6 @@ with free sources.
 | **Bing Webmaster** | API key (free) | Verified sites only | ★★★☆☆ | ~15% (Bing index) | Generous |
 | **Common Crawl** | None (public) | Yes | ★★★☆☆ | ~25-40% domains | N/A |
 | **Verification Crawler** | None | Yes | ★★★★★ (binary) | N/A (checks known links) | 1 req/s per domain |
-| **DataForSEO** (paid) | API key | Yes | ★★★★★ | ~90%+ | Per plan |
 
 ## Confidence Weighting
 
@@ -19,7 +18,6 @@ When merging data from multiple sources, apply confidence weights to each metric
 
 | Source | Weight | Rationale |
 |--------|--------|-----------|
-| DataForSEO | 1.00 | Commercial-grade, real-time, comprehensive |
 | Verification Crawler | 0.95 | Direct observation (binary: link exists or not) |
 | Moz API | 0.85 | Large index (45.5T links), established metrics, 3-day update lag |
 | Bing Webmaster | 0.70 | Smaller index (~15% of web), but authoritative for Bing-indexed pages |
@@ -74,16 +72,6 @@ When only Common Crawl is available, cap the maximum health score at 70/100 and 
 - **Input:** JSON file with `[{"source_url": "..."}]` entries
 - **Polite crawling:** 1-second delay between requests to same domain
 - **Best for:** Checking if known backlinks still exist, monitoring link health
-
-## When to Recommend DataForSEO Upgrade
-
-Suggest the paid DataForSEO extension when:
-- User needs **toxic link detection** beyond Moz's basic Spam Score
-- User needs **competitor gap analysis** at scale (Bing only compares verified sites)
-- User needs **link velocity trends** (new/lost links over time)
-- User needs **real-time data** (free sources update monthly at best)
-- User manages **multiple client sites** (free tier limits are per-account)
-- User needs **disavow file generation** with confidence scoring
 
 ## Data Quality Reality Check
 

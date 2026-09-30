@@ -132,7 +132,7 @@ def check_credentials(service: str) -> dict:
             result["verified"] = False
             result["note"] = (
                 "Moz credentials are configured but not live-verified by --check. "
-                "Run a Moz command such as `python scripts/moz_api.py metrics "
+                "Run a Moz command such as `~/.claude/skills/seo/run-script moz_api.py metrics "
                 "example.com --json` to test quota and permissions."
             )
         else:
@@ -207,7 +207,6 @@ def detect_tier() -> dict:
     Tier 0: No API keys (Common Crawl + Verification Crawler always available)
     Tier 1: Moz API key configured
     Tier 2: Moz + Bing configured
-    Tier 3: All + DataForSEO MCP available (checked externally)
 
     Returns:
         Dictionary with tier, description, capabilities, missing.
@@ -229,7 +228,7 @@ def detect_tier() -> dict:
                 "Common Crawl domain-level graph",
                 "Backlink verification crawler",
             ],
-            "missing": "Add DataForSEO extension for premium backlink data (paid)",
+            "missing": None,
         }
     elif has_moz:
         return {
@@ -326,7 +325,7 @@ TIER 1: MOZ API (free signup, 2,500 rows/month)
             referring domains, anchor text distribution (any domain).
   Rate limit: 1 request per 10 seconds.
   Note: `--check moz` reports whether credentials are configured; run
-        `python scripts/moz_api.py metrics example.com --json` for a live
+        `~/.claude/skills/seo/run-script moz_api.py metrics example.com --json` for a live
         permission/quota test.
 
 TIER 2: + BING WEBMASTER TOOLS API (free, verified sites)
@@ -351,17 +350,9 @@ TIER 2: + BING WEBMASTER TOOLS API (free, verified sites)
             competitor backlink comparison (unique feature!).
   Limitation: Only works for verified sites + their competitors.
 
-PREMIUM: DATAFORSEO EXTENSION (paid, most comprehensive)
-----------------------------------------------------------
-  For full commercial-grade backlink data, install the DataForSEO extension:
-    ./extensions/dataforseo/install.sh
-
-  Provides: 35+ trillion links, real-time updates, toxic scoring,
-            anchor text, competitor gap analysis, link velocity.
-
 VERIFY CONFIGURATION:
-  python scripts/backlinks_auth.py --check
-  python scripts/backlinks_auth.py --tier
+  ~/.claude/skills/seo/run-script backlinks_auth.py --check
+  ~/.claude/skills/seo/run-script backlinks_auth.py --tier
   `--check` is configuration-only for Moz/Bing and does not claim live
   verification unless a specific API query has been run.
 """)

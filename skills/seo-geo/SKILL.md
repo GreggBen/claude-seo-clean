@@ -13,7 +13,7 @@ argument-hint: "[url]"
 license: MIT
 metadata:
   author: AgriciDaniel
-  version: "2.2.0"
+  version: "2.2.1"
   category: seo
 ---
 
@@ -152,9 +152,9 @@ Check `robots.txt` for these AI crawlers:
 
 | Crawler | Owner | Purpose |
 |---------|-------|---------|
-| GPTBot | OpenAI | ChatGPT web search |
-| OAI-SearchBot | OpenAI | OpenAI search features |
-| ChatGPT-User | OpenAI | ChatGPT browsing |
+| GPTBot | OpenAI | Entraînement des modèles |
+| OAI-SearchBot | OpenAI | Recherche ChatGPT |
+| ChatGPT-User | OpenAI | Actions déclenchées par un utilisateur |
 | ClaudeBot | Anthropic | Claude web features |
 | PerplexityBot | Perplexity | Perplexity AI search |
 | CCBot | Common Crawl | Training data (often blocked) |
@@ -162,7 +162,7 @@ Check `robots.txt` for these AI crawlers:
 | Bytespider | ByteDance | TikTok/Douyin AI |
 | cohere-ai | Cohere | Cohere models |
 
-**Recommendation:** Allow GPTBot, OAI-SearchBot, ClaudeBot, PerplexityBot for AI search visibility. Block CCBot and training crawlers if desired.
+**Recommandation :** traiter séparément recherche (`OAI-SearchBot`) et entraînement (`GPTBot`). Autoriser le premier ne nécessite pas d'autoriser le second. `ChatGPT-User` ne contrôle pas l'inclusion dans la recherche ; ses actions peuvent ne pas suivre robots.txt. Aucun accès autorisé ne garantit une citation. Source vérifiée le 2026-09-28 : [documentation OpenAI](https://developers.openai.com/api/docs/bots). Pour les autres fournisseurs, vérifier leurs rôles et politiques officiels avant toute modification.
 
 ---
 
@@ -267,10 +267,6 @@ Generate `GEO-ANALYSIS.md` with:
 3. Establish YouTube channel with content mentions
 4. Implement comprehensive entity linking (sameAs across platforms)
 5. Develop unique tools or calculators
-
-## DataForSEO Integration (Optional)
-
-If DataForSEO MCP tools are available, use `ai_optimization_chat_gpt_scraper` to check what ChatGPT web search returns for target queries (real GEO visibility check) and `ai_opt_llm_ment_search` with `ai_opt_llm_ment_top_domains` for LLM mention tracking across AI platforms.
 
 ## Error Handling
 

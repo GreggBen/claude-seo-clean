@@ -86,6 +86,7 @@ def parse_html(html: str, base_url: Optional[str] = None) -> dict:
         "meta_description": None,
         "meta_robots": None,
         "canonical": None,
+        "canonical_urls": [],
         "h1": [],
         "h2": [],
         "h3": [],
@@ -126,9 +127,10 @@ def parse_html(html: str, base_url: Optional[str] = None) -> dict:
             result["twitter_card"][name] = content
 
     # Canonical
-    canonical = soup.find("link", rel="canonical")
-    if canonical:
-        result["canonical"] = canonical.get("href")
+    canonicals = soup.find_all("link", rel="canonical")
+    result["canonical_urls"] = [canonical.get("href") for canonical in canonicals]
+    if canonicals:
+        result["canonical"] = canonicals[0].get("href")
 
     # Hreflang
     for link in soup.find_all("link", rel="alternate"):

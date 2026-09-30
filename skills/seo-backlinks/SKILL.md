@@ -1,10 +1,10 @@
 ---
 name: seo-backlinks
-description: "Backlink profile analysis: referring domains, anchor text distribution, toxic link detection, competitor gap analysis. Works with free APIs (Moz, Bing Webmaster, Common Crawl) and DataForSEO extension. Use when user says backlinks, link profile, referring domains, anchor text, toxic links, link gap, link building, disavow, or backlink audit."
+description: "Backlink profile analysis: referring domains, anchor text distribution, toxic link detection, competitor gap analysis. Works with Common Crawl and optional Moz and Bing Webmaster data. Use when user says backlinks, link profile, referring domains, anchor text, toxic links, link gap, link building, disavow, or backlink audit."
 user-invocable: true
 argument-hint: "<url>"
 license: MIT
-compatibility: "Free: Common Crawl + verify always available. Optional: Moz API, Bing Webmaster (free signup). Premium: DataForSEO extension."
+compatibility: "Common Crawl + verify always available. Optional: Moz API and Bing Webmaster."
 metadata:
   author: AgriciDaniel
   version: "2.2.0"
@@ -17,13 +17,12 @@ metadata:
 
 Before analysis, detect available data sources:
 
-1. **DataForSEO MCP** (premium): Check if `dataforseo_backlinks_summary` tool is available
-2. **Moz API** (free signup): `python3 scripts/backlinks_auth.py --check moz --json`
-3. **Bing Webmaster** (free signup): `python3 scripts/backlinks_auth.py --check bing --json`
-4. **Common Crawl** (always available): Domain-level graph with PageRank
-5. **Verification Crawler** (always available): Checks if known backlinks still exist
+1. **Moz API** (free signup): `~/.claude/skills/seo/run-script backlinks_auth.py --check moz --json`
+2. **Bing Webmaster** (free signup): `~/.claude/skills/seo/run-script backlinks_auth.py --check bing --json`
+3. **Common Crawl** (always available): Domain-level graph with PageRank
+4. **Verification Crawler** (always available): Checks if known backlinks still exist
 
-Run `python3 scripts/backlinks_auth.py --check --json` to detect all sources at once.
+Run `~/.claude/skills/seo/run-script backlinks_auth.py --check --json` to detect all sources at once.
 
 If no sources are configured beyond the always-available tier:
 - Still produce a report using Common Crawl domain metrics
@@ -36,7 +35,6 @@ If no sources are configured beyond the always-available tier:
 | `/seo backlinks <url>` | Full backlink profile analysis (uses all available sources) |
 | `/seo backlinks gap <url1> <url2>` | Competitor backlink gap analysis |
 | `/seo backlinks toxic <url>` | Toxic link detection and disavow recommendations |
-| `/seo backlinks new <url>` | New and lost backlinks (DataForSEO only) |
 | `/seo backlinks verify <url> --links <file>` | Verify known backlinks still exist |
 | `/seo backlinks setup` | Show setup instructions for free backlink APIs |
 
@@ -46,11 +44,9 @@ Produce all 7 sections below. Each section lists data sources in preference orde
 
 ### 1. Profile Overview
 
-**DataForSEO:** `dataforseo_backlinks_summary` → total backlinks, referring domains, domain rank, follow ratio, trend.
+**Moz API:** `~/.claude/skills/seo/run-script moz_api.py metrics <url> --json` → Domain Authority, Page Authority, Spam Score, linking root domains, external links.
 
-**Moz API:** `python3 scripts/moz_api.py metrics <url> --json` → Domain Authority, Page Authority, Spam Score, linking root domains, external links.
-
-**Common Crawl:** `python3 scripts/commoncrawl_graph.py <domain> --json` → in-degree (referring domain count), PageRank, harmonic centrality.
+**Common Crawl:** `~/.claude/skills/seo/run-script commoncrawl_graph.py <domain> --json` → in-degree (referring domain count), PageRank, harmonic centrality.
 
 **Scoring:**
 
@@ -63,11 +59,9 @@ Produce all 7 sections below. Each section lists data sources in preference orde
 
 ### 2. Anchor Text Distribution
 
-**DataForSEO:** `dataforseo_backlinks_anchors`
+**Moz API:** `~/.claude/skills/seo/run-script moz_api.py anchors <url> --json`
 
-**Moz API:** `python3 scripts/moz_api.py anchors <url> --json`
-
-**Bing Webmaster:** `python3 scripts/bing_webmaster.py links <url> --json` (extract anchor text from link details)
+**Bing Webmaster:** `~/.claude/skills/seo/run-script bing_webmaster.py links <url> --json` (extract anchor text from link details)
 
 **Healthy distribution benchmarks:**
 
@@ -84,11 +78,9 @@ Flag if exact-match anchors exceed 15% -- this is a Google Penguin risk signal.
 
 ### 3. Referring Domain Quality
 
-**DataForSEO:** `dataforseo_backlinks_referring_domains`
+**Moz API:** `~/.claude/skills/seo/run-script moz_api.py domains <url> --json` → domains with DA scores
 
-**Moz API:** `python3 scripts/moz_api.py domains <url> --json` → domains with DA scores
-
-**Common Crawl:** `python3 scripts/commoncrawl_graph.py <domain> --json` → top referring domains (domain-level, no authority scores)
+**Common Crawl:** `~/.claude/skills/seo/run-script commoncrawl_graph.py <domain> --json` → top referring domains (domain-level, no authority scores)
 
 Analyze:
 - **TLD distribution**: .edu, .gov, .org = high authority. Excessive .xyz, .info = low quality
@@ -98,11 +90,9 @@ Analyze:
 
 ### 4. Toxic Link Detection
 
-**DataForSEO:** `dataforseo_backlinks_bulk_spam_score` + toxic patterns from reference
+**Moz API:** Spam Score from `~/.claude/skills/seo/run-script moz_api.py metrics <url> --json` (1-17% scale, >11% = high risk)
 
-**Moz API:** Spam Score from `python3 scripts/moz_api.py metrics <url> --json` (1-17% scale, >11% = high risk)
-
-**Verification Crawler:** `python3 scripts/verify_backlinks.py --target <url> --links <file> --json` (verify suspicious links still exist)
+**Verification Crawler:** `~/.claude/skills/seo/run-script verify_backlinks.py --target <url> --links <file> --json` (verify suspicious links still exist)
 
 **High-risk indicators (flag immediately):**
 - Links from known PBN (Private Blog Network) domains
@@ -122,9 +112,7 @@ Load `references/backlink-quality.md` for the full 30 toxic patterns and disavow
 
 ### 5. Top Pages by Backlinks
 
-**DataForSEO:** `dataforseo_backlinks_backlinks` with target type "page"
-
-**Moz API:** `python3 scripts/moz_api.py pages <domain> --json`
+**Moz API:** `~/.claude/skills/seo/run-script moz_api.py pages <domain> --json`
 
 Find:
 - Which pages attract the most backlinks
@@ -134,11 +122,9 @@ Find:
 
 ### 6. Competitor Gap Analysis
 
-**DataForSEO:** `dataforseo_backlinks_referring_domains` for both domains, then compare
+**Bing Webmaster (unique!):** `~/.claude/skills/seo/run-script bing_webmaster.py compare <url1> <url2> --json` — the only free tool with built-in competitor comparison
 
-**Bing Webmaster (unique!):** `python3 scripts/bing_webmaster.py compare <url1> <url2> --json` — the only free tool with built-in competitor comparison
-
-**Moz API:** Compare DA/PA between domains via `python3 scripts/moz_api.py metrics <url> --json` for each
+**Moz API:** Compare DA/PA between domains via `~/.claude/skills/seo/run-script moz_api.py metrics <url> --json` for each
 
 Output:
 - Domains linking to competitor but NOT to target = link building opportunities
@@ -148,11 +134,10 @@ Output:
 
 ### 7. New and Lost Backlinks
 
-**DataForSEO only:** `dataforseo_backlinks_backlinks` with date filters for 30/60/90 day changes
+**Verification Crawler:** For known links, verify current status with `~/.claude/skills/seo/run-script verify_backlinks.py`
 
-**Verification Crawler:** For known links, verify current status with `python3 scripts/verify_backlinks.py`
-
-**Note:** Free sources cannot track new/lost links over time. If this section is requested without DataForSEO, inform the user: "Link velocity tracking requires the DataForSEO extension. Free sources provide point-in-time snapshots only."
+**Note:** Available sources provide point-in-time snapshots. Do not infer link
+velocity or new/lost counts without comparable dated data.
 
 **Red flags:**
 - Sudden spike in new links (possible negative SEO attack)
@@ -165,13 +150,13 @@ Calculate a 0-100 score. When mixing sources, apply confidence weighting:
 
 | Factor | Weight | Sources (preference order) | Confidence |
 |--------|--------|---------------------------|------------|
-| Referring domain count | 20% | DataForSEO > Moz > CC in-degree | 1.0 / 0.85 / 0.50 |
-| Domain quality distribution | 20% | DataForSEO > Moz DA distribution | 1.0 / 0.85 |
-| Anchor text naturalness | 15% | DataForSEO > Moz > Bing anchors | 1.0 / 0.85 / 0.70 |
-| Toxic link ratio | 20% | DataForSEO > Moz spam score | 1.0 / 0.85 |
-| Link velocity trend | 10% | DataForSEO only | 1.0 |
-| Follow/nofollow ratio | 5% | DataForSEO > Bing details | 1.0 / 0.70 |
-| Geographic relevance | 10% | DataForSEO > Bing country | 1.0 / 0.70 |
+| Referring domain count | 20% | Moz > CC in-degree | 0.85 / 0.50 |
+| Domain quality distribution | 20% | Moz DA distribution | 0.85 |
+| Anchor text naturalness | 15% | Moz > Bing anchors | 0.85 / 0.70 |
+| Toxic link ratio | 20% | Moz spam score | 0.85 |
+| Link velocity trend | 10% | Unavailable; redistribute weight | N/A |
+| Follow/nofollow ratio | 5% | Bing details | 0.70 |
+| Geographic relevance | 10% | Bing country | 0.70 |
 
 **Data sufficiency gate:** Count how many of the 7 factors have at least one data source available.
 - **4+ factors with data:** Produce a numeric 0-100 score (redistribute missing weights proportionally)
@@ -197,7 +182,7 @@ the reality is we simply lack data.
 | Referring Domain Quality | pass/warn/fail | XX/100 | CC (0.50) |
 | Toxic Links | pass/warn/fail | XX/100 | Moz Spam (0.85) |
 | Top Pages | info | N/A | Moz (0.85) |
-| Link Velocity | pass/warn/fail | XX/100 | DataForSEO only |
+| Link Velocity | unknown | N/A | Dated comparable data unavailable |
 
 ### Critical Issues (fix immediately)
 ### High Priority (fix within 1 month)
@@ -208,20 +193,18 @@ the reality is we simply lack data.
 
 | Error | Cause | Resolution |
 |-------|-------|-----------|
-| No sources configured | No API keys, no DataForSEO | Run `/seo backlinks setup` |
+| No sources configured | No optional API keys | Use Common Crawl or run `/seo backlinks setup` |
 | Moz rate limit | Free tier: 1 req/10s | Wait 10 seconds, retry. Built into script. |
 | Bing site not verified | Site not verified in Bing | Verify at https://www.bing.com/webmasters |
 | CC download timeout | Large graph file, slow connection | Use `--timeout 180` flag |
-| DataForSEO unavailable | Extension not installed | Run `./extensions/dataforseo/install.sh` |
 | No backlink data returned | Domain too new or very small | Note: small sites may have <10 backlinks |
 
 **Fallback cascade:**
-1. DataForSEO available? → Use as primary (confidence: 1.0)
-2. Moz configured? → Use for DA/PA/spam/anchors (confidence: 0.85)
-3. Bing configured? → Use for links/competitor comparison (confidence: 0.70)
-4. Always: Common Crawl for domain-level metrics (confidence: 0.50)
-5. Always: Verification crawler for known link checks (confidence: 0.95)
-6. Nothing works? → "Run `/seo backlinks setup` to configure free APIs"
+1. Moz configured? → Use for DA/PA/spam/anchors (confidence: 0.85)
+2. Bing configured? → Use for links/competitor comparison (confidence: 0.70)
+3. Always: Common Crawl for domain-level metrics (confidence: 0.50)
+4. Always: Verification crawler for known link checks (confidence: 0.95)
+5. Nothing works? → "Run `/seo backlinks setup` to configure free APIs"
 
 ## Pre-Delivery Review (MANDATORY)
 

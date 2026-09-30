@@ -12,7 +12,7 @@ content architecture rather than relying on keyword text similarity or stemming.
 ### Step 1: Collect SERP Data
 
 For each keyword in the candidate set, retrieve the top 10 organic results:
-- Use WebSearch or DataForSEO `serp_organic_live_advanced`
+- Use WebSearch and record the query, locale, date, and returned result set
 - Extract only organic result URLs (ignore ads, featured snippets, PAA, knowledge panels)
 - Normalize URLs: strip protocol, trailing slash, and query parameters (except meaningful ones)
 - Store as a set of 10 URLs per keyword
@@ -43,8 +43,9 @@ Scores in the 3-4 range require tiebreaking:
 
 ## Optimization Strategy
 
-Full pairwise comparison of N keywords requires N*(N-1)/2 SERP fetches. For 40
-keywords, that is 780 comparisons. Optimize by reducing unnecessary checks:
+Full pairwise comparison of N keywords requires N SERP result sets and
+N*(N-1)/2 comparisons. For 40 keywords, that is 40 result sets and 780
+comparisons. Optimize by reducing unnecessary comparisons:
 
 ### Pre-Grouping
 
@@ -96,13 +97,10 @@ Diagonal is always 10 (a keyword overlaps perfectly with itself).
 
 ## Data Source Priority
 
-1. **DataForSEO** (if available): Most reliable, consistent SERP data. Use
-   `serp_organic_live_advanced` with `location_code: 2840` (US) and `language_code: "en"`.
-2. **WebSearch** (fallback): Adequate for clustering but results may vary by session.
-   Run multiple searches for the same keyword and use the most common result set.
+Use WebSearch and set the relevant locale. Results may vary by session;
+repeat uncertain queries and record any missing positions as unknown.
 
 ## Caching
 
-Within a single clustering session, cache all SERP results. If keyword A's results
-are fetched for the A-B comparison, reuse them for the A-C comparison. This halves
-the number of actual SERP fetches needed.
+Within a single clustering session, cache one result set per keyword and reuse it
+for every pair involving that keyword. This prevents duplicate searches.

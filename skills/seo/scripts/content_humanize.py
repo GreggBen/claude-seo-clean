@@ -18,8 +18,8 @@ their preferred replacement reads less naturally for SEO contexts
 
 CLI::
 
-    python scripts/content_humanize.py draft.md -o cleaned.md
-    cat draft.md | python scripts/content_humanize.py --json
+    ~/.claude/skills/seo/run-script content_humanize.py draft.md -o cleaned.md
+    cat draft.md | ~/.claude/skills/seo/run-script content_humanize.py --json
 """
 
 from __future__ import annotations

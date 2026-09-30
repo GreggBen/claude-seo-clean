@@ -17,9 +17,9 @@ as a Critical finding.
 
 Usage::
 
-    python scripts/gbp_deprecation_lint.py https://example.com
-    python scripts/gbp_deprecation_lint.py page.html --file
-    python scripts/gbp_deprecation_lint.py https://example.com --json
+    ~/.claude/skills/seo/run-script gbp_deprecation_lint.py https://example.com
+    ~/.claude/skills/seo/run-script gbp_deprecation_lint.py page.html --file
+    ~/.claude/skills/seo/run-script gbp_deprecation_lint.py https://example.com --json
 
 Exit code 0 if no deprecated patterns found, 1 otherwise.
 """

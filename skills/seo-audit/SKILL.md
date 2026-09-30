@@ -6,7 +6,7 @@ argument-hint: "[url]"
 license: MIT
 metadata:
   author: AgriciDaniel
-  version: "2.2.0"
+  version: "2.2.1"
   category: seo
 ---
 
@@ -14,7 +14,13 @@ metadata:
 
 ## Process
 
-1. **Render homepage**: use `python3 scripts/render_page.py <url> --mode auto --json` to capture raw HTML, rendered HTML, extracted text, SPA status, and accessibility data when needed
+Le contrat de rapport défini dans `../seo/SKILL.md` prime sur les étapes de
+scoring et les exemples d'enveloppe ci-dessous. Pour un projet interdisant les
+agrégats, omettre `health_score` et les champs de scores des catégories : rendre
+les constats, leurs preuves et leurs limites. Ne pas utiliser le générateur de
+rapport `full` s'il réintroduit ces agrégats ; rendre les constats directement.
+
+1. **Render homepage**: use `~/.claude/skills/seo/run-script render_page.py <url> --mode auto --json` to capture raw HTML, rendered HTML, extracted text, SPA status, and accessibility data when needed
 2. **Detect business type**: analyze homepage signals per seo orchestrator
 3. **Crawl site**: follow internal links up to 500 pages, respect robots.txt
 4. **Delegate to subagents** (if available, otherwise run inline sequentially):
@@ -26,13 +32,13 @@ metadata:
    - `seo-visual` -- screenshots, mobile testing, above-fold analysis
    - `seo-geo` -- AI crawler access, llms.txt, citability, brand mention signals
    - `seo-local` -- GBP signals, NAP consistency, reviews, local schema, industry-specific local factors (spawn when Local Service industry detected: brick-and-mortar, SAB, or hybrid business type)
-   - `seo-maps` -- Geo-grid rank tracking, GBP audit, review intelligence, competitor radius mapping (spawn when Local Service detected AND DataForSEO MCP available)
-   - `seo-google` -- CWV field data (CrUX), URL indexation (GSC), organic traffic (GA4) (spawn when Google API credentials detected via `python3 scripts/google_auth.py --check`)
-   - `seo-backlinks` -- Backlink profile data: DA/PA, referring domains, anchor text, toxic links (spawn when Moz or Bing API credentials detected via `python3 scripts/backlinks_auth.py --check`, or always include Common Crawl domain-level metrics)
+   - `seo-maps` -- Free listing, NAP, and competitor checks (spawn when Local Service detected)
+   - `seo-google` -- CWV field data (CrUX), URL indexation (GSC), organic traffic (GA4) (spawn when Google API credentials detected via `~/.claude/skills/seo/run-script google_auth.py --check`)
+   - `seo-backlinks` -- Backlink profile data: DA/PA, referring domains, anchor text, toxic links (spawn when Moz or Bing API credentials detected via `~/.claude/skills/seo/run-script backlinks_auth.py --check`, or always include Common Crawl domain-level metrics)
    - `seo-cluster` -- Semantic clustering analysis (spawn when content strategy signals detected: blog, pillar pages, topic clusters)
    - `seo-sxo` -- Search experience analysis: page-type mismatch, user stories, persona scoring (always include in full audits)
-   - `seo-drift` -- Drift analysis: compare against stored baseline (spawn when drift baseline exists for the URL via `python3 scripts/drift_history.py <url>`)
-   - `seo-ecommerce` -- Product schema, marketplace intelligence (spawn when E-commerce industry detected)
+   - `seo-drift` -- Drift analysis: compare against stored baseline (spawn when drift baseline exists for the URL via `~/.claude/skills/seo/run-script drift_history.py <url>`)
+   - `seo-ecommerce` -- Product page and schema analysis (spawn when E-commerce industry detected)
 5. **Score** -- aggregate into SEO Health Score (0-100)
 6. **Persist audit artifacts** -- write all outputs under `{domain}-audit/`
 7. **Report** -- generate prioritized action plan and optional PDF/HTML report
@@ -55,11 +61,11 @@ Delay between requests: 1 second
 - `{domain}-audit/audit-data.json`: Structured audit envelope for report generation
 - `{domain}-audit/findings/*.md`: Per-category specialist findings (`technical.md`, `content.md`, `schema.md`, `performance.md`, `visual.md`, etc.)
 - `{domain}-audit/screenshots/`: Desktop + mobile captures (if Playwright available)
-- **PDF Report** (recommended): Generate a professional A4 PDF using `scripts/google_report.py --type full --data {domain}-audit/audit-data.json --domain <domain> --output-dir {domain}-audit/`. This produces a white-cover enterprise report with TOC, executive summary, charts (Lighthouse gauges, query bars, index donut), metric cards, threshold tables, prioritized recommendations with effort estimates, and implementation roadmap. Always offer PDF generation after completing an audit.
+- **PDF Report** (recommended): Generate a professional A4 PDF using `~/.claude/skills/seo/run-script google_report.py --type full --data {domain}-audit/audit-data.json --domain <domain> --output-dir {domain}-audit/`. This produces a white-cover enterprise report with TOC, executive summary, charts (Lighthouse gauges, query bars, index donut), metric cards, threshold tables, prioritized recommendations with effort estimates, and implementation roadmap. Always offer PDF generation after completing an audit.
 
 ## Structured Audit Data Envelope
 
-Write `{domain}-audit/audit-data.json` with this shape so `python3 scripts/google_report.py --type full --data {domain}-audit/audit-data.json --domain <domain> --output-dir {domain}-audit/` can generate a report even when Google API data is unavailable:
+Write `{domain}-audit/audit-data.json` with this shape so `~/.claude/skills/seo/run-script google_report.py --type full --data {domain}-audit/audit-data.json --domain <domain> --output-dir {domain}-audit/` can generate a report even when Google API data is unavailable:
 
 ```json
 {
@@ -100,6 +106,12 @@ Write `{domain}-audit/audit-data.json` with this shape so `python3 scripts/googl
 ```
 
 ## Scoring Weights
+
+The SEO Health Score is a bounded heuristic over observed checks, not a measure
+of actual E-E-A-T or AI citations. Attach source and date to each observation.
+Separate publication, discoverability, indexation, citation, and visits in the
+report; mark any stage without direct evidence unknown. Neither a sitemap nor
+`llms.txt` guarantees indexation or citation.
 
 | Category | Weight |
 |----------|--------|
@@ -164,13 +176,9 @@ Write `{domain}-audit/audit-data.json` with this shape so `python3 scripts/googl
 - **Medium**: Optimization opportunity (fix within 1 month)
 - **Low**: Nice to have (backlog)
 
-## DataForSEO Integration (Optional)
-
-If DataForSEO MCP tools are available, spawn the `seo-dataforseo` agent alongside existing subagents to enrich the audit with live data: real SERP positions, backlink profiles with spam scores, on-page analysis (Lighthouse), business listings, and AI visibility checks (ChatGPT scraper, LLM mentions).
-
 ## Google API Integration (Optional)
 
-If Google API credentials are configured (`python3 scripts/google_auth.py --check`), spawn the `seo-google` agent to enrich the audit with real Google field data: CrUX Core Web Vitals (replaces lab-only estimates), GSC URL indexation status, search performance (clicks, impressions, CTR), and GA4 organic traffic trends. The Performance (CWV) category score benefits most from field data.
+If Google API credentials are configured (`~/.claude/skills/seo/run-script google_auth.py --check`), spawn the `seo-google` agent to enrich the audit with real Google field data: CrUX Core Web Vitals (replaces lab-only estimates), GSC URL indexation status, search performance (clicks, impressions, CTR), and GA4 organic traffic trends. The Performance (CWV) category score benefits most from field data.
 
 ## Error Handling
 
