@@ -160,6 +160,22 @@ List the exact trust signals this content needs:
 - Last updated date
 - Especially critical for YMYL topics (health, finance, legal, safety)
 
+## Decision-to-Action Pages
+
+When the page must lead to an action (service page, product page, landing
+page, FAQ section), structure the outline with
+`../seo/references/intent-to-action-chain.md`:
+
+- Order sections situation → need → technical checks → choosing a provider →
+  what we do; give each question a stable opaque id.
+- Each answer: direct answer, conditions and limits, concrete check, dated
+  source, next step (never "contact us" alone).
+- Use the situation as research only: no "agitate the pain", especially for
+  YMYL and regulated sectors; no emotion in markup.
+- Include a visible "who this is for / not for" block and an "unlisted
+  situation" path; do not invent prices, durations or eligibility thresholds
+  (mark them `PENDING_MERCHANT_INPUT`).
+
 ## Internal Linking
 
 - Suggest 3-5 specific internal link opportunities with anchor text

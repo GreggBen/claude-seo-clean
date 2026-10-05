@@ -139,6 +139,7 @@ Load these on-demand as needed (do NOT load all at startup):
 - `references/quality-gates.md`: Content length minimums, uniqueness thresholds
 - `references/local-seo-signals.md`: Local ranking factors, review benchmarks, citation tiers, GBP status
 - `references/local-schema-types.md`: LocalBusiness subtypes, industry-specific schema and citation sources
+- `references/intent-to-action-chain.md`: Situation → technical pages → open-world matching against declared criteria → evidence → typed next action → request snapshot (shared by seo-geo, seo-content-brief, seo-schema, seo-sxo)
 
 Maps-specific references (loaded by seo-maps skill, not at startup):
 - `references/maps-gbp-checklist.md`, `references/maps-free-apis.md`

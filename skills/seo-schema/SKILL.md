@@ -87,6 +87,15 @@ When generating schema for a page:
 4. Include only truthful, verifiable data. Use placeholders clearly marked for user to fill
 5. Validate output before presenting
 
+### Actions on answers
+
+When a `Question` leads to a next step, a `potentialAction` (`CommunicateAction`,
+`BuyAction`, `ReserveAction`) with an `EntryPoint.urlTemplate` can carry it.
+Generate the visible text and the JSON-LD from one source, keep URL
+parameters to allow-listed opaque ids (never the question text), and do not
+claim any display or citation effect. See
+`../seo/references/intent-to-action-chain.md` §6.
+
 ## Common Schema Templates
 
 ### Organization
