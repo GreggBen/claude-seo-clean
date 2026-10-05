@@ -184,6 +184,7 @@ The SXO score is **separate** from the main SEO Health Score.
 | Content depth gaps | `/seo page` for deep page analysis |
 | Technical issues found during fetch | `/seo technical` for full audit |
 | Image/media gaps | `/seo images` for optimization |
+| Page answers but offers no decision or next step (no "who for / not for", no typed action) | `../seo/references/intent-to-action-chain.md` checklist |
 
 ## Output Format
 

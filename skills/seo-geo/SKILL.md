@@ -241,6 +241,18 @@ Generate `GEO-ANALYSIS.md` with:
 
 ---
 
+## Decision Readiness (beyond citability)
+
+Citability answers "can an assistant quote this page?". Decision readiness
+answers "can an assistant decide whether this business fits the person it
+helps, and propose a legitimate next step?". When the site sells a service,
+product or sign-up, audit the chain in `../seo/references/intent-to-action-chain.md`
+(§11 checklist): situations in users' words, citable technical answers,
+visible "who for / who not for", open-world criteria (unlisted ≠ excluded),
+qualified evidence, typed next action with `never`, no intent text in URLs.
+Report each item as `PRESENT` / `PARTIAL` / `ABSENT` / `NOT_APPLICABLE` with
+evidence; it adds no points to any score and no citation effect is implied.
+
 ## Quick Wins
 
 1. Add "What is [topic]?" definition in first 60 words
