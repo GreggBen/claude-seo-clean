@@ -138,7 +138,8 @@ is `UNKNOWN`.
 | Surface | Reader | Content | Required? |
 |---|---|---|---|
 | Server-rendered HTML | Everyone | Visible text, authoritative | Yes |
-| `FAQPage` / `Product` / `Service` JSON-LD | Search engines, extractors | Same text as visible + actions | Recommended |
+| `Product` / `Offer` / `Service` JSON-LD | Search engines, extractors | Same facts as visible | Recommended where the type applies (see `seo-schema`) |
+| `FAQPage` / `QAPage` JSON-LD | Extractors | Same Q&A as visible + optional actions | Optional: FAQ rich results retired 2026-05-07; follow the canonical position in `../../seo-schema/SKILL.md` (keep existing markup, do not add it for SERP benefit) |
 | `/llms.txt`, `/<section>/ia.md` | Agents reading an index or dossier | Situations, answers, sources, action links, reading note | Optional |
 | `/fit.json` | Agents preferring structure | Who for, who not for, conditions, how to engage | Optional |
 | `/decision.json` | Agents that match | Criteria, states, action per question | Optional |
@@ -311,13 +312,14 @@ named object, accepted inputs, conditions, and prohibitions.
 
 | Level | Where | Form |
 |---|---|---|
-| Per question | `FAQPage` → `Question.potentialAction` | `CommunicateAction` (advice), `BuyAction` / `Offer` (commerce), `ReserveAction` (booking), with `EntryPoint.urlTemplate` |
+| Per question | Visible link under each answer; optionally `Question.potentialAction` where Q&A markup already exists | `CommunicateAction` (advice), `BuyAction` / `Offer` (commerce), `ReserveAction` (booking), with `EntryPoint.urlTemplate` |
 | Per segment | Dossier and `/decision.json` | Full URL with context, plus an "unlisted situation" URL |
 | Global | `next_action` | `type`, `url_template`, `parameters`, `never`, `offer` |
 
 `never` tells the assistant what it must not promise before sending the
-person on (e.g. "no instant quote"). `schema.org` actions are vocabulary, not a
-display guarantee.
+person on (e.g. "no instant quote"). The visible link carries the action;
+`schema.org` actions are optional vocabulary, not a display guarantee, and do
+not justify adding Q&A markup on their own.
 
 ### 6.2 The first step as an offer
 
@@ -426,7 +428,8 @@ Only the action and the criteria change. Hypotheses, to test per site:
 ## 11. Audit checklist
 
 Report each line as `PRESENT`, `PARTIAL`, `ABSENT` or `NOT_APPLICABLE`, with
-the URL or file as evidence. No global score.
+the URL or file as evidence. This checklist adds no score of its own and is
+not folded into any health or readiness score.
 
 **Intent**
 - [ ] Questions start from situations, in users' words, with sources labelled
@@ -453,8 +456,9 @@ the URL or file as evidence. No global score.
       counts once.
 
 **Action**
-- [ ] Per-question action (`potentialAction`) and a global `next_action` with
-      `never` and the first step described as an offer.
+- [ ] Per-question visible action link (markup optional) and a global next
+      step stating what it is not (`never`), with the first step described as
+      an offer.
 - [ ] Unknown offer fields named, not guessed.
 - [ ] Only allow-listed opaque parameters; no intent text in URLs, analytics
       or logs; sensitive-data notice where relevant.

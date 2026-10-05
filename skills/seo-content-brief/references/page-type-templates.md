@@ -78,7 +78,8 @@ Select the template that matches the page type. Adapt sections based on the spec
 | Section | Purpose | Format |
 |---------|---------|--------|
 | Hero (offer + CTA) | Convert above fold | Headline + subheadline + button |
-| Problem statement | Agitate pain | 2-3 sentences |
+| Situation statement | Acknowledge the reader's situation in their words; no fear-based agitation (mandatory for YMYL and regulated sectors) | 2-3 sentences |
+| Who this is for / not for | Let readers and assistants decide fit; unlisted cases are not excluded | Short bullets (see `../../seo/references/intent-to-action-chain.md` §4) |
 | Solution/benefits | Present the fix | 3-5 benefit bullets |
 | Social proof | Build trust | Testimonials, logos, stats |
 | How it works | Reduce friction | 3-step process |

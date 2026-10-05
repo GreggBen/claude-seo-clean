@@ -89,8 +89,10 @@ When generating schema for a page:
 
 ### Actions on answers
 
-When a `Question` leads to a next step, a `potentialAction` (`CommunicateAction`,
-`BuyAction`, `ReserveAction`) with an `EntryPoint.urlTemplate` can carry it.
+When an existing `FAQPage` or `QAPage` `Question` leads to a next step, a
+`potentialAction` (`CommunicateAction`, `BuyAction`, `ReserveAction`) with an
+`EntryPoint.urlTemplate` can carry it. This does not change the FAQPage rule
+above: do not add Q&A markup just to carry an action.
 Generate the visible text and the JSON-LD from one source, keep URL
 parameters to allow-listed opaque ids (never the question text), and do not
 claim any display or citation effect. See
