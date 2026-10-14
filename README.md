@@ -41,6 +41,10 @@ cd claude-seo-clean
 bash install.sh          # copie les skills/agents dans ~/.claude, prépare le venv Python
 ```
 
+L'installation s'arrête avant toute copie si un skill ou un agent `seo-*` existe
+déjà dans `~/.claude`. Vérifie et déplace les fichiers concernés avant de relancer ;
+l'installateur ne remplace pas silencieusement une installation existante.
+
 Les commandes de scripts dans les skills et agents passent par
 `~/.claude/skills/seo/run-script <nom-du-script.py> [arguments...]` : ce lanceur
 retrouve les scripts et le Python du venv installé depuis n'importe quel

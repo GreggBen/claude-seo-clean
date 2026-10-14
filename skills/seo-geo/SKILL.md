@@ -220,16 +220,21 @@ New standard (December 2025) for machine-readable AI licensing terms.
 > same conclusion ~86% of the time but cite the same URLs only **13.7%** of the
 > time (Ahrefs study, 540K query pairs). Treat them as separate surfaces: ranking
 > well in classic Search feeds AI Overviews, but AI Mode draws from a broader pool
-> where freshness and entity authority outweigh raw position. Score both.
+> where freshness and entity authority outweigh raw position. Compare the
+> two surfaces separately using dated observations and their coverage.
 
 ---
 
 ## Output
 
+Lire le contrat de rapport du projet dans `../seo/SKILL.md`. Si les scores
+agrégés sont interdits, omettre les scores GEO et par plateforme ; rendre les
+constats observés avec source, date, périmètre et limites.
+
 Generate `GEO-ANALYSIS.md` with:
 
-1. **GEO Readiness Score: XX/100**
-2. **Platform breakdown** (Google AIO, ChatGPT, Perplexity scores)
+1. **GEO Readiness Score: XX/100** (only when permitted by the project contract)
+2. **Platform breakdown** (Google AIO, ChatGPT, Perplexity observations; scores only when permitted)
 3. **AI Crawler Access Status** (which crawlers allowed/blocked)
 4. **llms.txt Status** (present, missing, recommendations)
 5. **Brand Mention Analysis** (presence on Wikipedia, Reddit, YouTube, LinkedIn)

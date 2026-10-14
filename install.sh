@@ -13,6 +13,22 @@ echo "== claude-seo-clean : installation =="
 command -v python3 >/dev/null 2>&1 || { echo "✗ Python 3 requis."; exit 1; }
 command -v git     >/dev/null 2>&1 || { echo "✗ Git requis."; exit 1; }
 
+for source in "${SRC_DIR}/skills/"seo*; do
+  target="${SKILLS_DST}/$(basename "${source}")"
+  if [[ -e "${target}" || -L "${target}" ]]; then
+    echo "✗ Installation arrêtée : ${target} existe déjà. Déplace-le après vérification avant de relancer." >&2
+    exit 1
+  fi
+done
+
+for source in "${SRC_DIR}/agents/"seo-*.md; do
+  target="${AGENTS_DST}/$(basename "${source}")"
+  if [[ -e "${target}" || -L "${target}" ]]; then
+    echo "✗ Installation arrêtée : ${target} existe déjà. Déplace-le après vérification avant de relancer." >&2
+    exit 1
+  fi
+done
+
 mkdir -p "${SKILLS_DST}" "${AGENTS_DST}"
 
 echo "→ Skills..."
@@ -38,4 +54,4 @@ echo ""
 echo "✓ Installé. 24 skills + 16 agents dans ~/.claude/ (aucun hook câblé, aucune extension payante)."
 echo "  Redémarre Claude Code, puis :  /seo audit https://ton-site.com"
 echo "  Scripts depuis tout répertoire :  ${SKILLS_DST}/seo/run-script portability_check.py --json"
-echo "  Désinstaller :  rm -rf ~/.claude/skills/seo* ~/.claude/agents/seo-*.md"
+echo "  Désinstaller : vérifie les fichiers installés dans ${SKILLS_DST} et ${AGENTS_DST} avant de les supprimer."

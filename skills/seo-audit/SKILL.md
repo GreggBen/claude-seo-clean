@@ -1,6 +1,6 @@
 ---
 name: seo-audit
-description: "Full website SEO audit with parallel subagent delegation. Crawls up to 500 pages, detects business type, delegates to up to 15 specialists (8 always + 7 conditional), generates health score. Use when user says audit, full SEO check, analyze my site, or website health check."
+description: "Full website SEO audit with parallel subagent delegation. Crawls up to 500 pages, detects business type, delegates to up to 15 specialists (8 always + 7 conditional), and optionally generates a health score when the project permits it. Use when user says audit, full SEO check, analyze my site, or website health check."
 user-invocable: true
 argument-hint: "[url]"
 license: MIT
@@ -39,7 +39,7 @@ rapport `full` s'il réintroduit ces agrégats ; rendre les constats directement
    - `seo-sxo` -- Search experience analysis: page-type mismatch, user stories, persona scoring (always include in full audits)
    - `seo-drift` -- Drift analysis: compare against stored baseline (spawn when drift baseline exists for the URL via `~/.claude/skills/seo/run-script drift_history.py <url>`)
    - `seo-ecommerce` -- Product page and schema analysis (spawn when E-commerce industry detected)
-5. **Score** -- aggregate into SEO Health Score (0-100)
+5. **Score, if permitted** -- aggregate into SEO Health Score (0-100) only when the project allows aggregate scores
 6. **Persist audit artifacts** -- write all outputs under `{domain}-audit/`
 7. **Report** -- generate prioritized action plan and optional PDF/HTML report
 
@@ -61,11 +61,11 @@ Delay between requests: 1 second
 - `{domain}-audit/audit-data.json`: Structured audit envelope for report generation
 - `{domain}-audit/findings/*.md`: Per-category specialist findings (`technical.md`, `content.md`, `schema.md`, `performance.md`, `visual.md`, etc.)
 - `{domain}-audit/screenshots/`: Desktop + mobile captures (if Playwright available)
-- **PDF Report** (recommended): Generate a professional A4 PDF using `~/.claude/skills/seo/run-script google_report.py --type full --data {domain}-audit/audit-data.json --domain <domain> --output-dir {domain}-audit/`. This produces a white-cover enterprise report with TOC, executive summary, charts (Lighthouse gauges, query bars, index donut), metric cards, threshold tables, prioritized recommendations with effort estimates, and implementation roadmap. Always offer PDF generation after completing an audit.
+- **PDF Report** (when compatible with the project contract): Generate an A4 PDF using `~/.claude/skills/seo/run-script google_report.py --type full --data {domain}-audit/audit-data.json --domain <domain> --output-dir {domain}-audit/`. Do not use this generator when it would restore prohibited aggregate scores.
 
 ## Structured Audit Data Envelope
 
-Write `{domain}-audit/audit-data.json` with this shape so `~/.claude/skills/seo/run-script google_report.py --type full --data {domain}-audit/audit-data.json --domain <domain> --output-dir {domain}-audit/` can generate a report even when Google API data is unavailable:
+When aggregate scores are permitted, write `{domain}-audit/audit-data.json` with this shape so `~/.claude/skills/seo/run-script google_report.py --type full --data {domain}-audit/audit-data.json --domain <domain> --output-dir {domain}-audit/` can generate a report even when Google API data is unavailable:
 
 ```json
 {
@@ -107,7 +107,7 @@ Write `{domain}-audit/audit-data.json` with this shape so `~/.claude/skills/seo/
 
 ## Scoring Weights
 
-The SEO Health Score is a bounded heuristic over observed checks, not a measure
+When permitted, the SEO Health Score is a bounded heuristic over observed checks, not a measure
 of actual E-E-A-T or AI citations. Attach source and date to each observation.
 Separate publication, discoverability, indexation, citation, and visits in the
 report; mark any stage without direct evidence unknown. Neither a sitemap nor
@@ -126,7 +126,7 @@ report; mark any stage without direct evidence unknown. Neither a sitemap nor
 ## Report Structure
 
 ### Executive Summary
-- Overall SEO Health Score (0-100)
+- Overall SEO Health Score (0-100), only when permitted
 - Business type detected
 - Top 5 critical issues
 - Top 5 quick wins
@@ -165,7 +165,7 @@ report; mark any stage without direct evidence unknown. Neither a sitemap nor
 - Format recommendations
 
 ### AI Search Readiness
-- Citability score
+- Citability score, only when permitted
 - Structural improvements
 - Authority signals
 

@@ -80,14 +80,15 @@ When the user invokes `/seo audit`, delegate to subagents in parallel:
 9. If e-commerce detected, also spawn seo-ecommerce agent
 10. If drift baseline exists for this URL (`~/.claude/skills/seo/run-script drift_history.py <url>`), also spawn seo-drift agent
 11. Always include seo-sxo in full audits (search experience applies to all sites)
-12. Collect results and generate unified report with SEO Health Score (0-100)
+12. Collect results and generate a unified report; include the bounded SEO Health Score (0-100) only when the project's report contract permits aggregate scores
 13. **Synthesize via the 10-principle framework** (see "Synthesis Methodology" below) — walk PERCEIVE → ANALYZE → VALIDATE → ACT before bucketing findings into Critical / High / Medium / Low
 14. Create prioritized action plan with dependency sequencing + falsifiability per recommendation
-15. **Offer PDF report**: "Generate a professional PDF report? Use `/seo google report full`"
+15. **Offer PDF report**, only if its output respects the project contract: "Generate a professional PDF report? Use `/seo google report full`"
 
 For individual commands, load the relevant sub-skill directly.
-After any analysis command completes, offer to generate a PDF report via
-`~/.claude/skills/seo/run-script google_report.py`.
+After any analysis command completes, offer a PDF report via
+`~/.claude/skills/seo/run-script google_report.py` only when its output
+respects the project's report contract.
 
 ## Synthesis Methodology
 
